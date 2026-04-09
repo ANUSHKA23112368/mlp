@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Streamlit App",
+      "type": "python",
+      "request": "launch",
+      "module": "streamlit",
+      "args": [
+        "run",
+        "app.py"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "FastAPI API",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "api:app",
+        "--reload"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Pytest",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "-q"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}
+

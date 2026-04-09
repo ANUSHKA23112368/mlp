@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.joblib
+.DS_Store
+dist/
+build/
+.streamlit/secrets.toml
+

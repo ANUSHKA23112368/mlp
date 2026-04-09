@@ -1,0 +1,51 @@
+complaint_text,department,urgency
+"Street lights have been out near the school for five nights and children are walking home in the dark.",public_safety,high
+"Garbage collection has been skipped twice this week and stray dogs are tearing open trash bags.",sanitation,medium
+"The water pipeline in our apartment block has been leaking continuously and pressure is now very low.",water,high
+"My electricity bill shows a sudden extra charge and the support desk has not explained the increase.",utilities,medium
+"Potholes on the main market road caused two bike accidents this morning and traffic is blocked.",roads,high
+"The local clinic lost my mother's test report and delayed treatment for three days.",health,high
+"Our sewer line overflowed into the street and the smell is unbearable for nearby homes.",sanitation,high
+"The bus route that connects our area to the station was cancelled without notice again.",transport,medium
+"Noise from late-night construction has continued past midnight for the last week.",public_safety,medium
+"The hospital billing desk charged us twice and no one has processed the refund request.",health,medium
+"Street vendors are blocking the emergency exit near the metro stairway during rush hour.",public_safety,high
+"Water supply stops every afternoon and families cannot store enough for cooking and washing.",water,high
+"The online property tax portal crashes before payment confirmation and penalties are increasing.",digital_services,medium
+"My complaint about broken traffic signals has been open for twelve days with no action.",transport,high
+"The public toilet near the bus stand has not been cleaned for days and is unusable.",sanitation,medium
+"A transformer sparked loudly last night and power has been unstable since then.",utilities,high
+"The school scholarship office keeps rejecting forms without telling students what is missing.",education,medium
+"A tree branch fell across the road after the storm and no cleanup crew has arrived.",roads,medium
+"Patients waited six hours because the registration system at the hospital went offline.",health,high
+"Drinking water smells contaminated and several residents reported stomach issues.",water,critical
+"The city grievance website does not send complaint acknowledgements after submission.",digital_services,low
+"Street dogs have become aggressive near the park and elderly residents are afraid to walk there.",public_safety,high
+"The college hostel has repeated Wi-Fi outages during exams and students cannot access materials.",education,medium
+"Road repair work was started and abandoned, leaving deep trenches uncovered.",roads,high
+"Garbage bins near the market are overflowing every evening and attracting insects.",sanitation,medium
+"Our electricity meter reading was recorded incorrectly and the revised bill is still wrong.",utilities,medium
+"The emergency ward had no wheelchair available for an elderly patient after admission.",health,high
+"The bus stop shelter roof is broken and commuters are exposed to rain and falling debris.",transport,medium
+"Textbook distribution for the new term is delayed and many students have no materials.",education,medium
+"There is a major waterlogging problem at the junction after every small rainfall.",roads,medium
+"Two street lights on the narrow lane behind the clinic have not worked for ten days.",public_safety,medium
+"My pension verification request on the citizen portal has been pending for over a month.",digital_services,medium
+"Open manholes were left without warning signs near a busy residential crossing.",roads,critical
+"Frequent voltage drops are damaging appliances in our building and nobody is inspecting the line.",utilities,high
+"The health center appointment system booked the same slot for multiple patients.",health,medium
+"The sanitation team missed biomedical waste pickup from the clinic for two days.",sanitation,high
+"Water tankers promised during the outage never arrived in our neighborhood.",water,high
+"The after-school bus driver skipped our stop twice and students were stranded.",transport,high
+"The university exam helpline never answers and students are missing correction deadlines.",education,medium
+"Street harassment incidents near the underpass have increased and police patrols are absent.",public_safety,critical
+"The app for paying utility bills logs users out and loses transaction history.",digital_services,medium
+"The road divider near the hospital entrance is broken and vehicles are entering the wrong side.",roads,high
+"Water supply contains visible sediment and residents are buying bottled water daily.",water,critical
+"Several classrooms have broken fans and students cannot sit through afternoon lectures.",education,low
+"Power cuts have become frequent in the industrial block and small businesses are losing orders.",utilities,high
+"Garbage collection workers ignored our lane despite repeated complaints this month.",sanitation,medium
+"The ambulance access lane is blocked by illegal parking every evening.",public_safety,critical
+"The city bus tracking app shows wrong arrival times and people are missing connections.",transport,low
+"A patient referral letter was uploaded to the wrong record in the hospital system.",health,high
+"Rainwater has damaged the road surface outside the school and children keep slipping.",roads,medium
