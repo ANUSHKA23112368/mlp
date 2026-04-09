@@ -13,12 +13,14 @@ CivicLens AI is a resume-ready ML and NLP project for analyzing customer tickets
 
 - Department classification from complaint text
 - Urgency prediction for triaging high-risk complaints
+- Confidence scoring for routing and urgency predictions
 - Complaint trend analytics and keyword intelligence
 - Extractive issue summaries for leadership-friendly reporting
-- Streamlit dashboard for interactive analysis
-- Dataset explorer for label and text distribution analysis
-- Operations view for filtering complaint queues by department and urgency
-- Batch complaint analysis table for uploaded CSV files
+- Command-center style Streamlit dashboard with a more polished UI
+- Case studio for single complaint analysis with SLA and action guidance
+- Dataset explorer for label, text, and prediction comparison analysis
+- Operations console for filtering complaint queues by department, urgency, and confidence
+- Batch complaint analysis table plus CSV and brief export tools
 - FastAPI service for deployment or portfolio demos
 
 ## Project structure
@@ -76,10 +78,11 @@ uvicorn api:app --reload
 2. Create a new Streamlit app from the repository.
 3. Set the app entry point to `app.py`.
 4. Let it install from `requirements.txt`.
+5. Choose Python `3.12` in the Streamlit advanced settings if prompted.
 
 Recommended files for this route:
 - `requirements.txt`
-- `runtime.txt`
+- `app.py`
 
 ### Render or Railway
 
