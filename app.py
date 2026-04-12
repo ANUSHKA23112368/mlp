@@ -65,6 +65,57 @@ def inject_theme() -> None:
             color: #edf5ff;
         }
 
+        [data-testid="stFileUploaderDropzone"] {
+            background: linear-gradient(180deg, rgba(61, 94, 140, 0.26) 0%, rgba(30, 47, 78, 0.48) 100%) !important;
+            border: 1px dashed rgba(255, 255, 255, 0.22) !important;
+            border-radius: 20px !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        [data-testid="stFileUploaderDropzone"] * {
+            color: #f5fbff !important;
+        }
+
+        [data-testid="stFileUploaderDropzone"] small,
+        [data-testid="stFileUploaderDropzone"] span,
+        [data-testid="stFileUploaderDropzone"] div {
+            color: #e6f3ff !important;
+        }
+
+        [data-testid="stFileUploaderDropzone"] button {
+            background: rgba(10, 21, 38, 0.82) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.24) !important;
+            border-radius: 14px !important;
+        }
+
+        [data-testid="stFileUploaderDropzone"] button:hover {
+            background: rgba(15, 139, 141, 0.6) !important;
+            border-color: rgba(255, 255, 255, 0.34) !important;
+            color: #ffffff !important;
+        }
+
+        [data-testid="stSidebar"] .stDownloadButton button {
+            width: 100%;
+            background: linear-gradient(135deg, #0f8b8d 0%, #2aa9a5 100%) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 10px 24px rgba(4, 12, 24, 0.22);
+        }
+
+        [data-testid="stSidebar"] .stDownloadButton button:hover {
+            background: linear-gradient(135deg, #0d7475 0%, #208f8c 100%) !important;
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.22) !important;
+        }
+
+        [data-testid="stSidebar"] .stDownloadButton button p,
+        [data-testid="stSidebar"] .stDownloadButton button span,
+        [data-testid="stSidebar"] .stDownloadButton button div {
+            color: #ffffff !important;
+        }
+
         h1, h2, h3, h4 {
             font-family: 'Space Grotesk', sans-serif;
             letter-spacing: -0.04em;
