@@ -1,6 +1,6 @@
 # CivicLens AI
 
-CivicLens AI is a resume-ready ML and NLP project for analyzing customer tickets, public grievance logs, or service complaints. It helps operations teams identify urgent issues faster, route cases to the right department, and summarize the biggest pain points from unstructured text.
+CivicLens AI is a ML and NLP project for analyzing customer tickets, public grievance logs, or service complaints. It helps operations teams identify urgent issues faster, route cases to the right department, and summarize the biggest pain points from unstructured text.
 
 ## Why this project is strong for a resume
 
@@ -42,62 +42,3 @@ CivicLens AI is a resume-ready ML and NLP project for analyzing customer tickets
 |-- Dockerfile
 `-- requirements.txt
 ```
-
-## Quick start
-
-```bash
-py -3.10 -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-Recommended local/runtime Python version: `3.10` to `3.12`.
-
-## Use in VS Code
-
-1. Open the project folder in VS Code.
-2. Run the task `Create venv (Python 3.10)` if `.venv` does not exist yet.
-3. Run the task `Install dependencies`.
-4. Press `F5` and choose `Streamlit App` or `FastAPI API`.
-5. Run `Pytest` from the Run and Debug panel or the `Run tests` task.
-
-The repo already includes `.vscode/settings.json`, `launch.json`, and `tasks.json` so you can start directly in VS Code without extra setup.
-
-## Run the API
-
-```bash
-uvicorn api:app --reload
-```
-
-## Deploy
-
-### Streamlit Community Cloud
-
-1. Push the repo to GitHub.
-2. Create a new Streamlit app from the repository.
-3. Set the app entry point to `app.py`.
-4. Let it install from `requirements.txt`.
-5. Choose Python `3.12` in the Streamlit advanced settings if prompted.
-
-Recommended files for this route:
-- `requirements.txt`
-- `app.py`
-
-### Render or Railway
-
-For Render, this repo now includes `render.yaml`.
-
-1. Push the repo to GitHub.
-2. In Render, create a new Blueprint or Web Service from the repository.
-3. Render will use:
-   - build command: `pip install -r requirements.txt`
-   - start command: `streamlit run app.py --server.port=$PORT --server.address=0.0.0.0`
-
-For Docker-based deployment, the repo also includes:
-- `Dockerfile`
-- `.dockerignore`
-
-## Suggested resume bullet
-
-Built an end-to-end NLP complaint intelligence platform using Python, scikit-learn, FastAPI, and Streamlit to classify issue ownership and urgency, generate executive summaries, and surface service risk trends from unstructured complaint data.
