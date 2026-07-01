@@ -2,8 +2,7 @@
 
 CivicLens AI is a ML and NLP project for analyzing customer tickets, public grievance logs, or service complaints. It helps operations teams identify urgent issues faster, route cases to the right department, and summarize the biggest pain points from unstructured text.
 
-## Why this project is strong for a resume
-
+## HIGHS
 - Solves a real operational problem with measurable business and civic impact
 - Uses end-to-end NLP and machine learning instead of only calling an LLM API
 - Includes model training, evaluation, analytics, a deployable web app, and API support
