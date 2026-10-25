@@ -14,16 +14,28 @@ if str(SRC) not in sys.path:
 
 from civiclens.analytics import (
     build_executive_report,
+    build_geo_and_channel_overview,
     build_overview,
     enrich_predictions,
     format_department,
     top_keywords,
 )
 from civiclens.data import load_demo_data, validate_dataset
-from civiclens.modeling import train_models
+from civiclens.deduplication import (
+    calculate_deduplication_metrics,
+    find_incident_clusters,
+    find_similar_complaints,
+)
+from civiclens.explainability import explain_prediction
+from civiclens.modeling import (
+    SUPPORTED_ALGORITHMS,
+    benchmark_models,
+    train_models,
+)
 from civiclens.summarizer import summarize_text
+from civiclens.topics import discover_topics
 
-st.set_page_config(page_title="CivicLens AI", page_icon="C", layout="wide")
+st.set_page_config(page_title="CivicLens AI", page_icon="🏛️", layout="wide")
 
 
 def inject_theme() -> None:
@@ -35,13 +47,14 @@ def inject_theme() -> None:
         :root {
             --ink: #112033;
             --muted: #5c6c7f;
-            --panel: rgba(255, 255, 255, 0.84);
-            --panel-strong: rgba(255, 255, 255, 0.94);
+            --panel: rgba(255, 255, 255, 0.88);
+            --panel-strong: rgba(255, 255, 255, 0.96);
             --line: rgba(148, 163, 184, 0.28);
             --accent: #0f8b8d;
             --accent-soft: #dff5f2;
             --amber: #f4a261;
             --rose: #f28482;
+            --purple: #8338ec;
         }
 
         html, body, [class*="css"] {
@@ -76,23 +89,11 @@ def inject_theme() -> None:
             color: #f5fbff !important;
         }
 
-        [data-testid="stFileUploaderDropzone"] small,
-        [data-testid="stFileUploaderDropzone"] span,
-        [data-testid="stFileUploaderDropzone"] div {
-            color: #e6f3ff !important;
-        }
-
         [data-testid="stFileUploaderDropzone"] button {
             background: rgba(10, 21, 38, 0.82) !important;
             color: #ffffff !important;
             border: 1px solid rgba(255, 255, 255, 0.24) !important;
             border-radius: 14px !important;
-        }
-
-        [data-testid="stFileUploaderDropzone"] button:hover {
-            background: rgba(15, 139, 141, 0.6) !important;
-            border-color: rgba(255, 255, 255, 0.34) !important;
-            color: #ffffff !important;
         }
 
         [data-testid="stSidebar"] .stDownloadButton button {
@@ -104,18 +105,6 @@ def inject_theme() -> None:
             box-shadow: 0 10px 24px rgba(4, 12, 24, 0.22);
         }
 
-        [data-testid="stSidebar"] .stDownloadButton button:hover {
-            background: linear-gradient(135deg, #0d7475 0%, #208f8c 100%) !important;
-            color: #ffffff !important;
-            border-color: rgba(255, 255, 255, 0.22) !important;
-        }
-
-        [data-testid="stSidebar"] .stDownloadButton button p,
-        [data-testid="stSidebar"] .stDownloadButton button span,
-        [data-testid="stSidebar"] .stDownloadButton button div {
-            color: #ffffff !important;
-        }
-
         h1, h2, h3, h4 {
             font-family: 'Space Grotesk', sans-serif;
             letter-spacing: -0.04em;
@@ -124,47 +113,48 @@ def inject_theme() -> None:
 
         .hero-card {
             background: linear-gradient(135deg, rgba(17, 32, 51, 0.98) 0%, rgba(15, 139, 141, 0.9) 58%, rgba(244, 162, 97, 0.82) 100%);
-            padding: 2.4rem;
-            border-radius: 30px;
+            padding: 2.2rem;
+            border-radius: 28px;
             color: #ffffff;
-            box-shadow: 0 26px 60px rgba(17, 32, 51, 0.22);
+            box-shadow: 0 24px 50px rgba(17, 32, 51, 0.20);
             margin-bottom: 1.2rem;
         }
 
         .hero-card h1 {
             color: #ffffff;
-            margin: 0.35rem 0 0.6rem 0;
-            font-size: 3.4rem;
+            margin: 0.35rem 0 0.5rem 0;
+            font-size: 3.2rem;
         }
 
         .hero-kicker {
             text-transform: uppercase;
             letter-spacing: 0.18em;
             font-size: 0.78rem;
-            opacity: 0.82;
+            opacity: 0.84;
         }
 
         .hero-copy {
-            max-width: 900px;
-            font-size: 1.08rem;
-            line-height: 1.7;
-            color: rgba(255, 255, 255, 0.9);
+            max-width: 950px;
+            font-size: 1.05rem;
+            line-height: 1.65;
+            color: rgba(255, 255, 255, 0.92);
         }
 
         .hero-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.7rem;
-            margin-top: 1.1rem;
+            gap: 0.65rem;
+            margin-top: 1rem;
         }
 
         .hero-pill {
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.14);
             color: #ffffff;
-            padding: 0.45rem 0.75rem;
+            padding: 0.42rem 0.75rem;
             border-radius: 999px;
-            font-size: 0.92rem;
+            font-size: 0.90rem;
+            font-weight: 500;
         }
 
         .metric-card {
@@ -172,16 +162,16 @@ def inject_theme() -> None:
             border: 1px solid rgba(255, 255, 255, 0.7);
             border-radius: 22px;
             padding: 1rem 1.1rem;
-            box-shadow: 0 16px 40px rgba(148, 163, 184, 0.16);
+            box-shadow: 0 14px 35px rgba(148, 163, 184, 0.15);
             min-height: 132px;
         }
 
         .metric-label {
-            font-size: 0.86rem;
+            font-size: 0.84rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: var(--muted);
-            margin-bottom: 0.55rem;
+            margin-bottom: 0.45rem;
         }
 
         .metric-value {
@@ -189,21 +179,21 @@ def inject_theme() -> None:
             font-size: 2rem;
             line-height: 1.05;
             color: var(--ink);
-            margin-bottom: 0.35rem;
+            margin-bottom: 0.30rem;
         }
 
         .metric-detail {
             color: var(--muted);
-            font-size: 0.92rem;
-            line-height: 1.5;
+            font-size: 0.90rem;
+            line-height: 1.45;
         }
 
         .surface-card {
             background: var(--panel-strong);
             border: 1px solid var(--line);
-            border-radius: 24px;
+            border-radius: 22px;
             padding: 1.2rem;
-            box-shadow: 0 16px 32px rgba(148, 163, 184, 0.12);
+            box-shadow: 0 14px 30px rgba(148, 163, 184, 0.12);
             margin-bottom: 1rem;
         }
 
@@ -212,29 +202,41 @@ def inject_theme() -> None:
             text-transform: uppercase;
             letter-spacing: 0.12em;
             font-size: 0.78rem;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.35rem;
+            font-weight: 700;
         }
 
         .panel-copy {
             color: var(--muted);
-            line-height: 1.7;
-            font-size: 0.98rem;
+            line-height: 1.65;
+            font-size: 0.96rem;
         }
 
         .chip-row {
             display: flex;
             flex-wrap: wrap;
             gap: 0.55rem;
-            margin-top: 0.85rem;
+            margin-top: 0.75rem;
         }
 
         .signal-chip {
             background: var(--accent-soft);
-            border: 1px solid rgba(15, 139, 141, 0.12);
+            border: 1px solid rgba(15, 139, 141, 0.18);
             color: var(--ink);
-            padding: 0.42rem 0.72rem;
+            padding: 0.38rem 0.70rem;
             border-radius: 999px;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+
+        .cluster-box {
+            background: #ffffff;
+            border: 1px solid rgba(15, 139, 141, 0.25);
+            border-left: 6px solid #0f8b8d;
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.85rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
         }
 
         .sidebar-card {
@@ -248,25 +250,20 @@ def inject_theme() -> None:
         .sidebar-title {
             font-family: 'Space Grotesk', sans-serif;
             color: #ffffff;
-            font-size: 1.2rem;
-            margin-bottom: 0.35rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
         }
 
-        div[data-testid="stTabs"] button[data-baseweb="tab"] {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #526070;
-        }
-
-        div[data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"] {
-            color: var(--ink);
-        }
-
-        div[data-testid="stMetric"] {
-            background: var(--panel-strong);
+        .highlight-container {
+            background: #ffffff;
             border: 1px solid var(--line);
-            padding: 0.8rem;
-            border-radius: 18px;
+            border-radius: 14px;
+            padding: 1.1rem;
+            line-height: 1.8;
+            font-size: 1.02rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
         }
         </style>
         """,
@@ -280,8 +277,8 @@ def get_demo_data() -> pd.DataFrame:
 
 
 @st.cache_resource
-def get_demo_artifacts():
-    return train_models(get_demo_data())
+def get_cached_artifacts(algorithm: str = "logistic_regression"):
+    return train_models(get_demo_data(), algorithm=algorithm)
 
 
 def render_metric_card(label: str, value: str, detail: str) -> None:
@@ -302,7 +299,7 @@ def render_surface_card(kicker: str, title: str, body: str) -> None:
         f"""
         <div class="surface-card">
             <div class="panel-kicker">{kicker}</div>
-            <h3>{title}</h3>
+            <h3 style="margin: 0.2rem 0 0.5rem 0;">{title}</h3>
             <div class="panel-copy">{body}</div>
         </div>
         """,
@@ -315,14 +312,14 @@ def render_signal_row(items: list[str]) -> None:
     st.markdown(f'<div class="chip-row">{chips}</div>', unsafe_allow_html=True)
 
 
-def load_active_dataset(uploaded_file) -> tuple[pd.DataFrame, object, str]:
+def load_active_dataset(uploaded_file, algorithm: str = "logistic_regression") -> tuple[pd.DataFrame, object, str]:
     if uploaded_file is None:
-        return get_demo_data(), get_demo_artifacts(), "Demo dataset"
+        return get_demo_data(), get_cached_artifacts(algorithm), "Demo dataset (150 complaints)"
 
     try:
         uploaded_df = pd.read_csv(io.BytesIO(uploaded_file.read()))
         dataset = validate_dataset(uploaded_df)
-        return dataset, train_models(dataset), "Uploaded dataset"
+        return dataset, train_models(dataset, algorithm=algorithm), "Uploaded dataset"
     except Exception as exc:
         st.sidebar.error(f"Could not process the uploaded CSV: {exc}")
         st.stop()
@@ -337,16 +334,6 @@ def make_prediction_frame(dataset: pd.DataFrame, artifacts) -> pd.DataFrame:
     return enrich_predictions(enriched)
 
 
-def build_dashboard_brief(dataset_name: str, overview: dict[str, object]) -> str:
-    return (
-        f"{dataset_name} currently contains {overview['total_cases']} complaints. "
-        f"{overview['high_risk_cases']} items are marked high risk and "
-        f"{overview['critical_cases']} are critical. "
-        f"The heaviest projected load is on {overview['most_loaded_department']}, while the "
-        f"average model confidence across routing and urgency is {overview['average_confidence']}%."
-    )
-
-
 def format_prediction_table(frame: pd.DataFrame) -> pd.DataFrame:
     display = frame.copy()
     rename_map = {
@@ -355,15 +342,20 @@ def format_prediction_table(frame: pd.DataFrame) -> pd.DataFrame:
         "urgency": "Actual Urgency",
         "predicted_department": "Predicted Department",
         "predicted_urgency": "Predicted Urgency",
-        "department_confidence": "Department Confidence",
-        "urgency_confidence": "Urgency Confidence",
+        "department_confidence": "Dept Confidence",
+        "urgency_confidence": "Urg Confidence",
         "combined_confidence": "Combined Confidence",
         "impact_area": "Impact Area",
         "target_sla": "Target SLA",
         "priority_label": "Priority",
         "risk_score": "Risk Score",
+        "frustration_score": "Frustration (0-100)",
+        "escalation_risk": "Escalation Risk",
+        "ward": "Ward / District",
+        "channel": "Intake Channel",
+        "timestamp": "Timestamp",
+        "status": "Status",
         "recommended_action": "Recommended Action",
-        "confidence_band": "Confidence Band",
     }
     for column in ["department", "predicted_department"]:
         if column in display.columns:
@@ -383,23 +375,33 @@ def queue_download(frame: pd.DataFrame) -> bytes:
 
 inject_theme()
 
+# ---------------------------------------------------------
+# Sidebar Controls & Global Setup
+# ---------------------------------------------------------
 with st.sidebar:
     st.markdown(
         """
         <div class="sidebar-card">
-            <div class="sidebar-title">CivicLens AI</div>
+            <div class="sidebar-title">🏛️ CivicLens AI v2.0</div>
             <div class="panel-copy">
-                A polished ML and NLP workspace for routing complaints, flagging urgency, and turning raw text into an operational queue.
+                Enterprise ML & NLP suite for citizen ticket triage, incident clustering, XAI attribution, and operational intelligence.
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    uploaded_file = st.file_uploader("Upload complaint CSV", type=["csv"])
-    st.caption("Required columns: complaint_text, department, urgency")
-    st.caption("Use the built-in demo data if you want to explore the dashboard instantly.")
+    
+    selected_algo = st.selectbox(
+        "Active ML Algorithm",
+        options=SUPPORTED_ALGORITHMS,
+        format_func=lambda a: a.replace("_", " ").title(),
+        index=0,
+    )
 
-dataset, artifacts, dataset_name = load_active_dataset(uploaded_file)
+    uploaded_file = st.file_uploader("Upload custom CSV", type=["csv"])
+    st.caption("Supports: complaint_text, department, urgency, ward, channel, status")
+
+dataset, artifacts, dataset_name = load_active_dataset(uploaded_file, algorithm=selected_algo)
 prediction_frame = make_prediction_frame(dataset, artifacts)
 overview = build_overview(prediction_frame)
 executive_report = build_executive_report(prediction_frame)
@@ -408,75 +410,98 @@ with st.sidebar:
     st.markdown(
         """
         <div class="sidebar-card">
-            <div class="sidebar-title">Included Tools</div>
+            <div class="sidebar-title">Quick Exports</div>
             <div class="panel-copy">
-                Single-case triage, batch queue review, executive brief export, confidence scoring, SLA guidance, and searchable dataset inspection.
+                Export intelligence brief or full filtered operational queue in standard formats.
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
     st.download_button(
-        "Download Executive Brief",
+        "📄 Download Executive Brief",
         data=executive_report,
         file_name="civiclens_executive_brief.txt",
         mime="text/plain",
         use_container_width=True,
     )
     st.download_button(
-        "Download Full Queue CSV",
+        "📥 Download Full Queue CSV",
         data=queue_download(prediction_frame.sort_values("risk_score", ascending=False)),
         file_name="civiclens_queue.csv",
         mime="text/csv",
         use_container_width=True,
     )
 
+# ---------------------------------------------------------
+# Hero Banner
+# ---------------------------------------------------------
+dedup_metrics = overview.get("deduplication_metrics", {})
 st.markdown(
     f"""
     <div class="hero-card">
-        <div class="hero-kicker">Operational ML and NLP workspace</div>
+        <div class="hero-kicker">Operational ML & NLP Grievance Intelligence</div>
         <h1>CivicLens AI</h1>
         <div class="hero-copy">
-            Turn unstructured complaints into routing decisions, urgency signals, analyst-ready queues, and leadership-ready reporting from a single dashboard.
+            Classify issue ownership and urgency, detect near-duplicate incident clusters, explain predictions with token attribution, and monitor citizen frustration flashpoints in real time.
         </div>
         <div class="hero-meta">
-            <span class="hero-pill">Source: {dataset_name}</span>
-            <span class="hero-pill">Most loaded: {overview['most_loaded_department']}</span>
-            <span class="hero-pill">Average confidence: {overview['average_confidence']}%</span>
-            <span class="hero-pill">High-risk cases: {overview['high_risk_cases']}</span>
+            <span class="hero-pill">Dataset: {dataset_name}</span>
+            <span class="hero-pill">Model: {selected_algo.replace('_', ' ').title()}</span>
+            <span class="hero-pill">Dept Pressure: {overview['most_loaded_department']}</span>
+            <span class="hero-pill">Confidence: {overview['average_confidence']}%</span>
+            <span class="hero-pill">Dedup Savings: {dedup_metrics.get('dispatches_saved', 0)} dispatches avoided</span>
         </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-st.caption(build_dashboard_brief(dataset_name, overview))
-
-tab1, tab2, tab3, tab4, tab5 = st.tabs(
-    ["Command Center", "Case Studio", "Data Explorer", "Ops Console", "Model Quality"]
+# ---------------------------------------------------------
+# Main Tabs Navigation
+# ---------------------------------------------------------
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
+    [
+        "Command Center",
+        "Case Studio & Explainability",
+        "Incident Clusters & Deduplication",
+        "Emerging Topics (NMF)",
+        "Data Explorer",
+        "Ops Console",
+        "Model Quality & Benchmark",
+    ]
 )
 
+# ---------------------------------------------------------
+# TAB 1: Command Center
+# ---------------------------------------------------------
 with tab1:
-    metric_cols = st.columns(4)
+    metric_cols = st.columns(5)
     with metric_cols[0]:
-        render_metric_card("Incoming Cases", str(overview["total_cases"]), f"Live view from {dataset_name.lower()}.")
+        render_metric_card("Total Inflow", str(overview["total_cases"]), f"Cases from {dataset_name.lower()}.")
     with metric_cols[1]:
         render_metric_card(
             "Urgent Share",
             f"{overview['urgent_rate']}%",
-            f"{overview['high_risk_cases']} complaints need accelerated response.",
+            f"{overview['high_risk_cases']} items require expedited action.",
         )
     with metric_cols[2]:
         render_metric_card(
             "Critical Cases",
             str(overview["critical_cases"]),
-            "Immediate escalation candidates based on predicted urgency.",
+            "Immediate emergency triage escalation.",
         )
     with metric_cols[3]:
         render_metric_card(
-            "Avg Confidence",
-            f"{overview['average_confidence']}%",
-            "Combined routing and urgency certainty from the classifier.",
+            "Citizen Frustration",
+            f"{overview.get('average_frustration', 0)}/100",
+            "Calculated emotional distress index.",
+        )
+    with metric_cols[4]:
+        render_metric_card(
+            "Dedup Savings",
+            f"{dedup_metrics.get('dispatches_saved', 0)} cases",
+            f"{dedup_metrics.get('deduplication_rate_pct', 0)}% redundant dispatches saved.",
         )
 
     left, right = st.columns([1.15, 0.85])
@@ -484,6 +509,7 @@ with tab1:
     urgency_df = pd.DataFrame(overview["urgency_distribution"])
     action_df = pd.DataFrame(overview["action_board"])
     queue_df = pd.DataFrame(overview["top_risks"])
+    geo_data = overview.get("geo_analytics", {})
 
     with left:
         st.markdown("### Department Pressure Board")
@@ -491,24 +517,25 @@ with tab1:
             pressure_chart = department_df.set_index("predicted_department")[["cases", "urgent_cases"]]
             pressure_chart.index = pressure_chart.index.map(format_department)
             st.bar_chart(pressure_chart, use_container_width=True)
+            
             dept_display = department_df.copy()
             dept_display["predicted_department"] = dept_display["predicted_department"].map(format_department)
             dept_display = dept_display.rename(
                 columns={
                     "predicted_department": "Department",
-                    "cases": "Cases",
+                    "cases": "Total Cases",
                     "urgent_cases": "Urgent Cases",
                     "avg_risk_score": "Avg Risk Score",
                 }
             )
             st.dataframe(dept_display, use_container_width=True, hide_index=True)
 
-        st.markdown("### Priority Queue")
+        st.markdown("### Priority Escalation Queue")
         if not queue_df.empty:
             queue_display = format_prediction_table(queue_df)
             st.dataframe(queue_display, use_container_width=True, hide_index=True)
             st.download_button(
-                "Download priority queue",
+                "Download priority queue CSV",
                 data=queue_download(queue_df),
                 file_name="civiclens_priority_queue.csv",
                 mime="text/csv",
@@ -516,8 +543,8 @@ with tab1:
 
     with right:
         render_surface_card(
-            "Executive Summary",
-            "Leadership Brief",
+            "Executive Brief",
+            "Leadership Summary",
             executive_report.replace("\n", "<br>"),
         )
 
@@ -532,284 +559,409 @@ with tab1:
             urgency_chart.index = urgency_chart.index.str.title()
             st.bar_chart(urgency_chart, use_container_width=True)
 
-        st.markdown("### Action Board")
-        if not action_df.empty:
-            action_display = action_df.copy()
-            action_display["predicted_department"] = action_display["predicted_department"].map(
-                format_department
-            )
-            action_display = action_display.rename(
-                columns={
-                    "predicted_department": "Department",
-                    "urgent_cases": "Urgent Cases",
-                    "avg_risk_score": "Avg Risk Score",
-                    "avg_sla_hours": "Avg SLA (hours)",
-                }
-            )
-            st.dataframe(action_display, use_container_width=True, hide_index=True)
+        if geo_data.get("ward_distribution"):
+            st.markdown("### Ward / Geographic Pressure")
+            ward_df = pd.DataFrame(geo_data["ward_distribution"]).head(5)
+            if not ward_df.empty:
+                w_chart = ward_df.set_index("ward")[["cases", "urgent_cases"]]
+                st.bar_chart(w_chart, use_container_width=True)
 
+        if geo_data.get("channel_distribution"):
+            st.markdown("### Intake Channels")
+            ch_df = pd.DataFrame(geo_data["channel_distribution"])
+            st.dataframe(ch_df, use_container_width=True, hide_index=True)
+
+# ---------------------------------------------------------
+# TAB 2: Case Studio & Explainability
+# ---------------------------------------------------------
 with tab2:
-    st.markdown("### Case Studio")
-    st.caption("Analyze a fresh complaint and get routing, urgency, confidence, and response guidance in one view.")
+    st.markdown("### Case Studio & Explainable AI (XAI)")
+    st.caption("Evaluate a single complaint, inspect token-level feature attribution, check citizen frustration, and detect duplicate tickets.")
 
     case_templates = {
-        "Street safety incident": "Street lights near the girls' hostel have been out for a week and students feel unsafe returning after evening classes.",
-        "Healthcare delay": "My father was admitted in pain but the registration system crashed and we waited hours without a bed assignment.",
-        "Water disruption": "Water supply has been contaminated for two days and several families in our block reported stomach illness after using it.",
-        "Custom input": "The city bus tracking app keeps showing wrong arrival times and commuters are missing work connections every morning.",
+        "Water Main Rupture": "Major main water pipeline burst on 5th Avenue near the central library, gushing thousands of gallons and flooding nearby shops.",
+        "Transformer Explosion": "Electric transformer exploded with loud bang near West Industrial gate 3, thick smoke billowing and power cut.",
+        "Healthcare Emergency Delay": "The hospital emergency triage nurse refused treatment to accident victim demanding prior police clearance.",
+        "Broken Traffic Signal": "Traffic signals at Central Crossway junction are dead, creating massive gridlock and near-head-on collisions.",
+        "Street Safety Hazard": "Street lights near the girls' hostel have been out for a week and students feel unsafe returning after evening classes.",
+        "Custom Input": "The city grievance website does not send complaint acknowledgements after submission and error 500 occurs.",
     }
-    selected_case = st.selectbox("Quick scenario", list(case_templates.keys()))
+    selected_scenario = st.selectbox("Preloaded Scenarios", list(case_templates.keys()))
+    
     with st.form("case_form"):
         case_text = st.text_area(
-            "Complaint narrative",
-            value=case_templates[selected_case],
-            height=220,
+            "Complaint Narrative",
+            value=case_templates[selected_scenario],
+            height=140,
         )
-        run_case = st.form_submit_button("Run Case Intelligence")
+        run_case = st.form_submit_button("Run Deep Case Intelligence")
 
-    if run_case:
+    if run_case or case_text:
         case_frame = enrich_predictions(artifacts.predict([case_text]))
         case = case_frame.iloc[0]
         case_summary = summarize_text(case_text, max_sentences=2)
         issue_signals = [term.replace("_", " ") for term, _ in top_keywords([case_text], limit=6)]
 
-        result_cols = st.columns(4)
+        # Run Explainability
+        dept_explanation = explain_prediction(artifacts.department_model, case_text, top_k=6)
+        urg_explanation = explain_prediction(artifacts.urgency_model, case_text, top_k=6)
+
+        # Check duplicate similarity against database
+        similar_in_queue = find_similar_complaints(
+            case_text, dataset["complaint_text"].tolist(), top_k=2, threshold=0.22
+        )
+
+        st.markdown("---")
+        result_cols = st.columns(5)
         with result_cols[0]:
-            render_metric_card("Department", format_department(case["predicted_department"]), "Primary owner for the complaint.")
+            render_metric_card("Department", format_department(case["predicted_department"]), "Primary routing destination.")
         with result_cols[1]:
             render_metric_card("Urgency", str(case["predicted_urgency"]).title(), case["priority_label"])
         with result_cols[2]:
-            render_metric_card(
-                "Dept Confidence",
-                f"{case['department_confidence'] * 100:.1f}%",
-                case["confidence_band"],
-            )
+            render_metric_card("Dept Confidence", f"{case['department_confidence'] * 100:.1f}%", case["confidence_band"])
         with result_cols[3]:
-            render_metric_card("Target SLA", case["target_sla"], "Response window suggested by the urgency model.")
+            render_metric_card("Target SLA", case["target_sla"], f"{case['target_sla_hours']}h turnaround window.")
+        with result_cols[4]:
+            render_metric_card(
+                "Frustration Index",
+                f"{case['frustration_score']}/100",
+                case["escalation_risk"],
+            )
 
-        detail_left, detail_right = st.columns([1.05, 0.95])
+        # In-Queue Duplicate Warning
+        if similar_in_queue:
+            st.warning(
+                f"⚠️ **Potential Duplicate Alert:** Detected {len(similar_in_queue)} similar incident report(s) already in the active queue! (Top Similarity: {similar_in_queue[0]['similarity_score'] * 100:.1f}%)"
+            )
+            with st.expander("View Matching Reports in Queue"):
+                for m in similar_in_queue:
+                    st.write(f"- **Sim: {m['similarity_score'] * 100:.1f}%**: {m['complaint_text']}")
+
+        detail_left, detail_right = st.columns([1.1, 0.9])
         with detail_left:
-            render_surface_card("Summary", "Case Summary", case_summary)
-            render_surface_card("Routing", "Recommended Action", str(case["recommended_action"]))
-            st.markdown("### Detected Signals")
-            if issue_signals:
-                render_signal_row(issue_signals)
+            st.markdown("#### Explainable AI: Token Attribution")
+            st.caption("Words shaded in teal contributed most strongly to the predicted department:")
+            st.markdown(
+                f'<div class="highlight-container">{dept_explanation["highlighted_html"]}</div>',
+                unsafe_allow_html=True,
+            )
+
+            # Bar chart of token importance
+            if dept_explanation["positive_features"]:
+                tok_df = pd.DataFrame(dept_explanation["positive_features"]).set_index("token")[["score"]]
+                tok_df = tok_df.rename(columns={"score": "Importance Score"})
+                st.bar_chart(tok_df, use_container_width=True)
+
+            render_surface_card("Summary", "Extractive Summary", case_summary)
+            render_surface_card("Routing Guidance", "Recommended Action", str(case["recommended_action"]))
 
         with detail_right:
             render_surface_card(
-                "Impact",
-                "Service Impact Area",
-                f"This complaint most closely maps to <strong>{str(case['impact_area']).title()}</strong> and should be tracked under the <strong>{format_department(case['predicted_department'])}</strong> queue.",
+                "Liaison Guidance",
+                f"Citizen Escalation Level: {case['escalation_risk']}",
+                f"{case['liaison_guidance']}<br><br><strong>Frustration Signals:</strong> {', '.join(case['frustration_signals']) if case['frustration_signals'] else 'None detected'}",
             )
+
+            render_surface_card(
+                "Impact Mapping",
+                "Service Impact Area",
+                f"Maps to <strong>{str(case['impact_area']).title()}</strong> under the <strong>{format_department(case['predicted_department'])}</strong> operational domain.",
+            )
+
+            st.markdown("#### Detected Issue Keywords")
+            if issue_signals:
+                render_signal_row(issue_signals)
+
             st.metric("Urgency Confidence", f"{case['urgency_confidence'] * 100:.1f}%")
             st.progress(float(case["urgency_confidence"]))
             st.metric("Combined Confidence", f"{case['combined_confidence'] * 100:.1f}%")
             st.progress(float(case["combined_confidence"]))
 
+# ---------------------------------------------------------
+# TAB 3: Incident Clusters & Deduplication Hub
+# ---------------------------------------------------------
 with tab3:
+    st.markdown("### Incident Clusters & Deduplication Hub")
+    st.caption("When emergencies occur, citizens report the same issue multiple times. This engine groups near-duplicate reports to prevent redundant field dispatches.")
+
+    cluster_threshold = st.slider("Cosine Similarity Threshold", 0.15, 0.45, 0.22, 0.01)
+    clusters = find_incident_clusters(prediction_frame, similarity_threshold=cluster_threshold)
+    dedup = calculate_deduplication_metrics(clusters, len(prediction_frame))
+
+    c_metric_cols = st.columns(4)
+    with c_metric_cols[0]:
+        render_metric_card("Incident Clusters", str(dedup["incident_clusters_count"]), "Distinct physical events detected.")
+    with c_metric_cols[1]:
+        render_metric_card("Duplicate Reports", str(dedup["duplicate_cases_found"]), "Corroborating follow-up complaints.")
+    with c_metric_cols[2]:
+        render_metric_card("Deduplication Rate", f"{dedup['deduplication_rate_pct']}%", "Share of duplicate tickets.")
+    with c_metric_cols[3]:
+        render_metric_card("Dispatches Saved", f"{dedup['dispatches_saved']} crews", "Avoided redundant dispatches.")
+
+    st.markdown("---")
+    st.markdown("#### Active Incident Clusters")
+
+    if not clusters:
+        st.info("No incident clusters detected at this threshold. Try lowering the similarity threshold slightly.")
+    else:
+        for c in clusters:
+            with st.container():
+                st.markdown(
+                    f"""
+                    <div class="cluster-box">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="margin: 0; color: #0f8b8d;">Cluster #{c['cluster_id']}: {c['incident_topic']}</h4>
+                            <span class="hero-pill" style="background: #0f8b8d; font-size: 0.8rem;">{c['total_reports']} Reports</span>
+                        </div>
+                        <p style="margin: 0.4rem 0 0.2rem 0; font-size: 0.85rem; color: #5c6c7f;">
+                            <strong>Department:</strong> {format_department(c.get('department', 'General'))} &nbsp;|&nbsp;
+                            <strong>Urgency:</strong> {str(c.get('urgency', 'medium')).title()} &nbsp;|&nbsp;
+                            <strong>Ward:</strong> {c.get('ward', 'General')}
+                        </p>
+                        <p style="margin: 0.3rem 0; font-size: 0.95rem; color: #112033;">
+                            <strong>Primary Ticket:</strong> "{c['primary_complaint']}"
+                        </p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+                with st.expander(f"View {c['corroborating_count']} Corroborating Ticket(s) in Cluster #{c['cluster_id']}"):
+                    for rep in c["corroborating_reports"]:
+                        st.markdown(f"- *\"{rep}\"*")
+
+# ---------------------------------------------------------
+# TAB 4: Emerging Topics (NMF Unsupervised NLP)
+# ---------------------------------------------------------
+with tab4:
+    st.markdown("### Emerging Topics (Unsupervised NLP Mining)")
+    st.caption("Automatically discover underlying issue themes and emerging civic trends from raw text without requiring pre-assigned category labels.")
+
+    num_topics = st.slider("Number of Topics to Mine", min_value=3, max_value=8, value=5)
+    discovered = discover_topics(prediction_frame["complaint_text"].tolist(), n_topics=num_topics)
+
+    t_cols = st.columns(min(len(discovered), 4))
+    for i, t in enumerate(discovered[:4]):
+        with t_cols[i]:
+            render_metric_card(
+                f"Topic #{t['topic_id']}",
+                f"{t['prevalence_pct']}%",
+                f"{t['sample_count']} complaints",
+            )
+
+    st.markdown("---")
+    for t in discovered:
+        with st.container():
+            st.markdown(f"#### Topic #{t['topic_id']}: {t['topic_name']} ({t['prevalence_pct']}% of queue)")
+            render_signal_row(t["keywords"])
+            with st.expander(f"Representative Complaints for Topic #{t['topic_id']}"):
+                for rep in t["representative_complaints"]:
+                    st.write(f"- *\"{rep}\"*")
+
+# ---------------------------------------------------------
+# TAB 5: Data Explorer
+# ---------------------------------------------------------
+with tab5:
     st.markdown("### Data Explorer")
     explorer = prediction_frame.copy()
 
-    filter_cols = st.columns(3)
+    filter_cols = st.columns(4)
     with filter_cols[0]:
-        search_text = st.text_input("Search complaint text", placeholder="water, billing, safety...")
+        search_text = st.text_input("Search text", placeholder="pipeline, hospital, dark...")
     with filter_cols[1]:
-        department_filter = st.multiselect(
-            "Actual department filter",
-            options=sorted(dataset["department"].unique().tolist()),
-            default=sorted(dataset["department"].unique().tolist()),
-        )
+        dept_options = sorted(dataset["department"].unique().tolist())
+        dept_filter = st.multiselect("Department", options=dept_options, default=dept_options)
     with filter_cols[2]:
-        urgency_filter = st.multiselect(
-            "Actual urgency filter",
-            options=sorted(dataset["urgency"].unique().tolist()),
-            default=sorted(dataset["urgency"].unique().tolist()),
-        )
+        urg_options = sorted(dataset["urgency"].unique().tolist())
+        urg_filter = st.multiselect("Urgency", options=urg_options, default=urg_options)
+    with filter_cols[3]:
+        ward_options = sorted(dataset["ward"].unique().tolist()) if "ward" in dataset.columns else []
+        ward_filter = st.multiselect("Ward", options=ward_options, default=ward_options)
 
     if search_text:
         explorer = explorer[explorer["complaint_text"].str.contains(search_text, case=False, na=False)]
-    explorer = explorer[explorer["department"].isin(department_filter)]
-    explorer = explorer[explorer["urgency"].isin(urgency_filter)]
+    if dept_filter:
+        explorer = explorer[explorer["department"].isin(dept_filter)]
+    if urg_filter:
+        explorer = explorer[explorer["urgency"].isin(urg_filter)]
+    if ward_filter and "ward" in explorer.columns:
+        explorer = explorer[explorer["ward"].isin(ward_filter)]
 
-    department_agreement = (prediction_frame["department"] == prediction_frame["predicted_department"]).mean() * 100
-    urgency_agreement = (prediction_frame["urgency"] == prediction_frame["predicted_urgency"]).mean() * 100
-    avg_length = prediction_frame["complaint_text"].str.len().mean()
+    dept_agree = (prediction_frame["department"] == prediction_frame["predicted_department"]).mean() * 100
+    urg_agree = (prediction_frame["urgency"] == prediction_frame["predicted_urgency"]).mean() * 100
+    avg_len = prediction_frame["complaint_text"].str.len().mean()
 
-    profile_cols = st.columns(4)
-    with profile_cols[0]:
-        render_metric_card("Visible Rows", str(len(explorer)), "Rows after search and label filters.")
-    with profile_cols[1]:
-        render_metric_card("Avg Text Length", f"{avg_length:.0f}", "Average characters per complaint.")
-    with profile_cols[2]:
-        render_metric_card("Dept Agreement", f"{department_agreement:.1f}%", "Actual label vs prediction on the active dataset.")
-    with profile_cols[3]:
-        render_metric_card("Urgency Agreement", f"{urgency_agreement:.1f}%", "Useful for spotting where more training data is needed.")
+    p_cols = st.columns(4)
+    with p_cols[0]:
+        render_metric_card("Visible Records", str(len(explorer)), "Filtered count.")
+    with p_cols[1]:
+        render_metric_card("Avg Text Length", f"{avg_len:.0f} chars", "Average length.")
+    with p_cols[2]:
+        render_metric_card("Dept Agreement", f"{dept_agree:.1f}%", "Ground truth match.")
+    with p_cols[3]:
+        render_metric_card("Urgency Agreement", f"{urg_agree:.1f}%", "Ground truth match.")
 
-    chart_left, chart_right = st.columns(2)
-    with chart_left:
-        st.markdown("### Actual Department Distribution")
-        actual_department_counts = dataset["department"].value_counts().rename_axis("department").to_frame("cases")
-        actual_department_counts.index = actual_department_counts.index.map(format_department)
-        st.bar_chart(actual_department_counts, use_container_width=True)
-    with chart_right:
-        st.markdown("### Predicted Department Distribution")
-        predicted_department_counts = (
-            prediction_frame["predicted_department"].value_counts().rename_axis("department").to_frame("cases")
-        )
-        predicted_department_counts.index = predicted_department_counts.index.map(format_department)
-        st.bar_chart(predicted_department_counts, use_container_width=True)
-
-    st.markdown("### Filtered Records")
-    explorer_display = format_prediction_table(
-        explorer[
-            [
-                "complaint_text",
-                "department",
-                "urgency",
-                "predicted_department",
-                "predicted_urgency",
-                "combined_confidence",
-                "impact_area",
-                "target_sla",
-            ]
-        ]
-    )
+    st.markdown("#### Records")
+    display_cols = [
+        "complaint_text",
+        "department",
+        "predicted_department",
+        "urgency",
+        "predicted_urgency",
+        "combined_confidence",
+        "frustration_score",
+        "escalation_risk",
+        "ward",
+        "channel",
+        "target_sla",
+    ]
+    avail_cols = [c for c in display_cols if c in explorer.columns]
+    explorer_display = format_prediction_table(explorer[avail_cols])
     st.dataframe(explorer_display, use_container_width=True, hide_index=True)
 
-with tab4:
+# ---------------------------------------------------------
+# TAB 6: Ops Console
+# ---------------------------------------------------------
+with tab6:
     st.markdown("### Ops Console")
     ops = prediction_frame.copy()
 
     ops_cols = st.columns(4)
     with ops_cols[0]:
-        predicted_department_filter = st.selectbox(
-            "Predicted department",
+        pred_dept = st.selectbox(
+            "Filter Department",
             options=["all"] + sorted(prediction_frame["predicted_department"].unique().tolist()),
+            format_func=lambda d: "All Departments" if d == "all" else format_department(d),
         )
     with ops_cols[1]:
-        predicted_urgency_filter = st.multiselect(
-            "Predicted urgency",
+        pred_urg = st.multiselect(
+            "Filter Urgency",
             options=sorted(prediction_frame["predicted_urgency"].unique().tolist()),
             default=sorted(prediction_frame["predicted_urgency"].unique().tolist()),
         )
     with ops_cols[2]:
-        confidence_threshold = st.slider("Min confidence", 0.0, 1.0, 0.45, 0.05)
+        min_conf = st.slider("Min Confidence", 0.0, 1.0, 0.40, 0.05)
     with ops_cols[3]:
-        max_rows = st.slider("Rows to show", 5, max(5, len(prediction_frame)), min(12, len(prediction_frame)))
+        max_rows = st.slider("Display Limit", 5, len(prediction_frame), min(15, len(prediction_frame)))
 
-    if predicted_department_filter != "all":
-        ops = ops[ops["predicted_department"] == predicted_department_filter]
-    ops = ops[ops["predicted_urgency"].isin(predicted_urgency_filter)]
-    ops = ops[ops["combined_confidence"] >= confidence_threshold]
+    if pred_dept != "all":
+        ops = ops[ops["predicted_department"] == pred_dept]
+    ops = ops[ops["predicted_urgency"].isin(pred_urg)]
+    ops = ops[ops["combined_confidence"] >= min_conf]
 
     if ops.empty:
-        st.warning("No complaints match the current filters. Lower the confidence threshold or widen the urgency selection.")
+        st.warning("No complaints match the current filters.")
     else:
-        summary_cols = st.columns(4)
-        with summary_cols[0]:
-            render_metric_card("Visible Queue", str(len(ops)), "Filtered complaint count for review.")
-        with summary_cols[1]:
-            render_metric_card("Avg Risk", f"{ops['risk_score'].mean():.1f}", "Risk score blends urgency, length, and uncertainty.")
-        with summary_cols[2]:
+        o_cols = st.columns(4)
+        with o_cols[0]:
+            render_metric_card("Active Queue", str(len(ops)), "Filtered complaints.")
+        with o_cols[1]:
+            render_metric_card("Avg Risk Score", f"{ops['risk_score'].mean():.1f}", "Blended operational severity.")
+        with o_cols[2]:
             render_metric_card(
-                "Fast SLA Cases",
+                "Expedited SLA (≤8h)",
                 str(int((ops["target_sla_hours"] <= 8).sum())),
-                "Cases expected to move within the same working window.",
+                "High & critical cases.",
             )
-        with summary_cols[3]:
+        with o_cols[3]:
             render_metric_card(
-                "Needs Review",
+                "Needs Analyst Review",
                 str(int((ops["combined_confidence"] < 0.6).sum())),
-                "Low-confidence items that may need manual analyst validation.",
+                "Low confidence items.",
             )
 
-        ops_left, ops_right = st.columns([0.95, 1.05])
-        with ops_left:
-            st.markdown("### Department vs Urgency Heatmap")
-            heatmap = ops.pivot_table(
-                index="predicted_department",
-                columns="predicted_urgency",
-                values="complaint_text",
-                aggfunc="count",
-                fill_value=0,
-            )
-            heatmap.index = heatmap.index.map(format_department)
-            st.dataframe(heatmap, use_container_width=True)
-
-            st.markdown("### Queue Brief")
-            st.write(build_executive_report(ops))
-
-        with ops_right:
-            st.markdown("### Operational Queue")
-            queue_columns = [
-                "complaint_text",
-                "predicted_department",
-                "predicted_urgency",
-                "combined_confidence",
-                "impact_area",
-                "target_sla",
-                "priority_label",
-                "risk_score",
-                "recommended_action",
-            ]
-            queue_view = ops.sort_values(["risk_score", "combined_confidence"], ascending=[False, True]).head(max_rows)
-            queue_display = format_prediction_table(queue_view[queue_columns])
-            st.dataframe(queue_display, use_container_width=True, hide_index=True)
-
-            download_col1, download_col2 = st.columns(2)
-            with download_col1:
-                st.download_button(
-                    "Download filtered queue",
-                    data=queue_download(queue_view[queue_columns]),
-                    file_name="civiclens_filtered_queue.csv",
-                    mime="text/csv",
-                    use_container_width=True,
-                )
-            with download_col2:
-                st.download_button(
-                    "Download filtered brief",
-                    data=build_executive_report(ops),
-                    file_name="civiclens_filtered_brief.txt",
-                    mime="text/plain",
-                    use_container_width=True,
-                )
-
-with tab5:
-    st.markdown("### Model Quality")
-    st.info(
-        "These metrics come from a holdout validation split on the active dataset. On the demo data, treat the scores as directional portfolio metrics rather than production-grade benchmarks."
-    )
-
-    metrics = artifacts.metrics
-    metric_cols = st.columns(2)
-    with metric_cols[0]:
-        st.metric("Department Accuracy", metrics["department_accuracy"])
-        department_report = pd.DataFrame(metrics["department_report"]).transpose().round(3)
-        st.dataframe(department_report, use_container_width=True)
-    with metric_cols[1]:
-        st.metric("Urgency Accuracy", metrics["urgency_accuracy"])
-        urgency_report = pd.DataFrame(metrics["urgency_report"]).transpose().round(3)
-        st.dataframe(urgency_report, use_container_width=True)
-
-    st.markdown("### Review Queue for Model Improvement")
-    low_confidence_cases = prediction_frame.sort_values("combined_confidence").head(8)
-    low_confidence_display = format_prediction_table(
-        low_confidence_cases[
-            [
-                "complaint_text",
-                "department",
-                "urgency",
-                "predicted_department",
-                "predicted_urgency",
-                "combined_confidence",
-                "impact_area",
-            ]
+        st.markdown("#### Operational Dispatch Queue")
+        q_cols = [
+            "complaint_text",
+            "predicted_department",
+            "predicted_urgency",
+            "combined_confidence",
+            "frustration_score",
+            "escalation_risk",
+            "target_sla",
+            "risk_score",
+            "recommended_action",
         ]
-    )
-    st.dataframe(low_confidence_display, use_container_width=True, hide_index=True)
+        q_view = ops.sort_values(["risk_score", "frustration_score"], ascending=[False, False]).head(max_rows)
+        st.dataframe(format_prediction_table(q_view[q_cols]), use_container_width=True, hide_index=True)
 
-    render_surface_card(
-        "Roadmap",
-        "High-Value Next Improvements",
-        "Expand the training dataset, add richer complaint metadata such as location and timestamp, persist trained models, and track drift between uploaded data and the original training mix.",
-    )
+        d1, d2 = st.columns(2)
+        with d1:
+            st.download_button(
+                "📥 Export Filtered Queue (CSV)",
+                data=queue_download(q_view[q_cols]),
+                file_name="civiclens_filtered_queue.csv",
+                mime="text/csv",
+                use_container_width=True,
+            )
+        with d2:
+            st.download_button(
+                "📄 Export Queue Brief (TXT)",
+                data=build_executive_report(ops),
+                file_name="civiclens_queue_brief.txt",
+                mime="text/plain",
+                use_container_width=True,
+            )
+
+# ---------------------------------------------------------
+# TAB 7: Model Quality & Benchmark
+# ---------------------------------------------------------
+with tab7:
+    st.markdown("### Model Quality & Multi-Model Benchmark")
+    st.caption("Compare multiple machine learning architectures on cross-validated holdout metrics to pick the best model for production routing.")
+
+    st.markdown("#### Algorithm Leaderboard (3-Fold Stratified CV)")
+    with st.spinner("Benchmarking models across cross-validation folds..."):
+        bench_results = benchmark_models(dataset, cv_splits=3)
+
+    bench_df = pd.DataFrame(bench_results["leaderboard"])
+    bench_display = bench_df.rename(
+        columns={
+            "display_name": "Algorithm",
+            "department_accuracy": "Dept Accuracy",
+            "department_weighted_f1": "Dept Weighted F1",
+            "urgency_accuracy": "Urgency Accuracy",
+            "urgency_weighted_f1": "Urgency Weighted F1",
+            "training_latency_ms": "Latency (ms)",
+        }
+    ).drop(columns=["algorithm"])
+    st.dataframe(bench_display, use_container_width=True, hide_index=True)
+
+    st.success(f"🏆 **Recommended Champion Model:** {bench_results['best_algorithm'].replace('_', ' ').title()}")
+
+    st.markdown("---")
+    st.markdown(f"#### Active Model Performance ({selected_algo.replace('_', ' ').title()})")
+    metrics = artifacts.metrics
+
+    m_col1, m_col2 = st.columns(2)
+    with m_col1:
+        st.metric("Department Accuracy", f"{metrics['department_accuracy'] * 100:.1f}%")
+        st.caption("Classification Report: Department")
+        dept_rep = pd.DataFrame(metrics["department_report"]).transpose().round(3)
+        st.dataframe(dept_rep, use_container_width=True)
+
+    with m_col2:
+        st.metric("Urgency Accuracy", f"{metrics['urgency_accuracy'] * 100:.1f}%")
+        st.caption("Classification Report: Urgency")
+        urg_rep = pd.DataFrame(metrics["urgency_report"]).transpose().round(3)
+        st.dataframe(urg_rep, use_container_width=True)
+
+    # Confusion Matrices
+    if "confusion_matrices" in metrics:
+        st.markdown("#### Interactive Confusion Matrices")
+        cm_c1, cm_c2 = st.columns(2)
+        with cm_c1:
+            st.markdown("**Department Confusion Matrix**")
+            d_cm = metrics["confusion_matrices"]["department"]
+            d_cm_df = pd.DataFrame(d_cm["matrix"], index=d_cm["labels"], columns=d_cm["labels"])
+            st.dataframe(d_cm_df, use_container_width=True)
+        with cm_c2:
+            st.markdown("**Urgency Confusion Matrix**")
+            u_cm = metrics["confusion_matrices"]["urgency"]
+            u_cm_df = pd.DataFrame(u_cm["matrix"], index=u_cm["labels"], columns=u_cm["labels"])
+            st.dataframe(u_cm_df, use_container_width=True)
+
+    st.markdown("#### Active Learning: Lowest Confidence Queue")
+    st.caption("These items have the lowest model certainty and represent the highest-value candidates for manual analyst labeling:")
+    low_conf = prediction_frame.sort_values("combined_confidence").head(6)
+    lc_cols = ["complaint_text", "predicted_department", "predicted_urgency", "combined_confidence", "impact_area"]
+    st.dataframe(format_prediction_table(low_conf[lc_cols]), use_container_width=True, hide_index=True)

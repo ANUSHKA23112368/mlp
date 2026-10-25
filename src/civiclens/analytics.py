@@ -5,21 +5,23 @@ from typing import Any
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 
+from civiclens.deduplication import calculate_deduplication_metrics, find_incident_clusters
+from civiclens.sentiment import analyze_sentiment
 from civiclens.summarizer import summarize_text
 
 URGENCY_SCORE = {"low": 1, "medium": 2, "high": 3, "critical": 4}
 SLA_TARGET_HOURS = {"low": 72, "medium": 24, "high": 8, "critical": 2}
 IMPACT_LEXICON = {
-    "public safety": ["unsafe", "harassment", "police", "crime", "emergency", "school"],
-    "infrastructure": ["road", "pothole", "street", "light", "transformer", "manhole"],
-    "water and sanitation": ["water", "leak", "overflow", "garbage", "sewer", "waste"],
-    "health service": ["hospital", "clinic", "patient", "treatment", "ambulance"],
-    "digital service": ["portal", "website", "app", "system", "online", "billing"],
+    "public safety": ["unsafe", "harassment", "police", "crime", "emergency", "school", "dog", "gang"],
+    "infrastructure": ["road", "pothole", "street", "light", "transformer", "manhole", "bridge"],
+    "water and sanitation": ["water", "leak", "overflow", "garbage", "sewer", "waste", "drain"],
+    "health service": ["hospital", "clinic", "patient", "treatment", "ambulance", "doctor", "medicine"],
+    "digital service": ["portal", "website", "app", "system", "online", "billing", "otp"],
 }
 
 
 def format_department(label: str) -> str:
-    return label.replace("_", " ").title()
+    return str(label).replace("_", " ").title()
 
 
 def top_keywords(texts: list[str], limit: int = 10) -> list[tuple[str, int]]:
@@ -77,10 +79,14 @@ def recommend_action(department: str, urgency: str) -> str:
 def add_risk_score(frame: pd.DataFrame) -> pd.DataFrame:
     enriched = frame.copy()
     enriched["urgency_score"] = enriched["predicted_urgency"].map(URGENCY_SCORE).fillna(1)
+    
+    frustration = enriched["frustration_score"] if "frustration_score" in enriched.columns else 30
+    
     enriched["risk_score"] = (
-        enriched["urgency_score"] * 24
-        + enriched["complaint_text"].str.len().clip(upper=260) / 11
-        + (1 - enriched["combined_confidence"]) * 18
+        enriched["urgency_score"] * 20
+        + (frustration / 100) * 18
+        + enriched["complaint_text"].str.len().clip(upper=260) / 12
+        + (1 - enriched["combined_confidence"]) * 14
     ).round(2)
     return enriched
 
@@ -115,7 +121,69 @@ def enrich_predictions(frame: pd.DataFrame) -> pd.DataFrame:
         lambda row: recommend_action(row["predicted_department"], row["predicted_urgency"]),
         axis=1,
     )
+
+    # Sentiment & citizen frustration analysis
+    sentiments = [analyze_sentiment(t) for t in enriched["complaint_text"]]
+    enriched["sentiment_score"] = [s["sentiment_score"] for s in sentiments]
+    enriched["frustration_score"] = [s["frustration_score"] for s in sentiments]
+    enriched["escalation_risk"] = [s["escalation_risk"] for s in sentiments]
+    enriched["frustration_signals"] = [s["frustration_signals"] for s in sentiments]
+    enriched["liaison_guidance"] = [s["liaison_guidance"] for s in sentiments]
+
     return add_risk_score(enriched)
+
+
+def build_geo_and_channel_overview(frame: pd.DataFrame) -> dict[str, Any]:
+    enriched = frame if "frustration_score" in frame.columns else enrich_predictions(frame)
+
+    # Ward analytics
+    ward_col = "ward" if "ward" in enriched.columns else None
+    if ward_col:
+        ward_summary = (
+            enriched.groupby("ward")
+            .agg(
+                cases=("complaint_text", "size"),
+                urgent_cases=(
+                    "predicted_urgency",
+                    lambda v: int(v.isin(["high", "critical"]).sum()),
+                ),
+                avg_frustration=("frustration_score", "mean"),
+                avg_risk_score=("risk_score", "mean"),
+            )
+            .sort_values(["urgent_cases", "cases"], ascending=False)
+            .reset_index()
+        )
+        ward_summary["avg_frustration"] = ward_summary["avg_frustration"].round(1)
+        ward_summary["avg_risk_score"] = ward_summary["avg_risk_score"].round(2)
+        ward_data = ward_summary.to_dict(orient="records")
+    else:
+        ward_data = []
+
+    # Channel analytics
+    chan_col = "channel" if "channel" in enriched.columns else None
+    if chan_col:
+        chan_summary = (
+            enriched.groupby("channel")
+            .agg(
+                cases=("complaint_text", "size"),
+                urgent_cases=(
+                    "predicted_urgency",
+                    lambda v: int(v.isin(["high", "critical"]).sum()),
+                ),
+                avg_frustration=("frustration_score", "mean"),
+            )
+            .sort_values("cases", ascending=False)
+            .reset_index()
+        )
+        chan_summary["avg_frustration"] = chan_summary["avg_frustration"].round(1)
+        chan_data = chan_summary.to_dict(orient="records")
+    else:
+        chan_data = []
+
+    return {
+        "ward_distribution": ward_data,
+        "channel_distribution": chan_data,
+    }
 
 
 def build_executive_report(frame: pd.DataFrame) -> str:
@@ -128,6 +196,8 @@ def build_executive_report(frame: pd.DataFrame) -> str:
         f"Critical cases: {overview['critical_cases']}\n"
         f"Urgent share: {overview['urgent_rate']}%\n"
         f"Average confidence: {overview['average_confidence']}%\n"
+        f"Average citizen frustration: {overview.get('average_frustration', 0)}/100\n"
+        f"Identified duplicate/corroborating tickets: {overview.get('deduplication_metrics', {}).get('duplicate_cases_found', 0)}\n"
         f"Most pressured department: {overview['most_loaded_department']}\n"
         f"Recurring issue signals: {keywords}\n\n"
         f"Leadership summary:\n{overview['executive_summary']}\n"
@@ -179,11 +249,42 @@ def build_overview(frame: pd.DataFrame) -> dict[str, Any]:
         action_board["avg_sla_hours"] = action_board["avg_sla_hours"].round(1)
 
     average_confidence = round(enriched["combined_confidence"].mean() * 100, 1)
+    average_frustration = round(float(enriched["frustration_score"].mean()), 1)
+
     most_loaded_department = (
         format_department(by_department.iloc[0]["predicted_department"])
         if not by_department.empty
         else "No data"
     )
+
+    # Escalation risk distribution
+    escalation_distribution = (
+        enriched.groupby("escalation_risk")
+        .size()
+        .rename("cases")
+        .reset_index()
+        .to_dict(orient="records")
+    )
+
+    # Incident clusters & deduplication
+    clusters = find_incident_clusters(enriched)
+    dedup_metrics = calculate_deduplication_metrics(clusters, len(enriched))
+
+    # Ward and channel breakdown
+    geo_analytics = build_geo_and_channel_overview(enriched)
+
+    top_risks_columns = [
+        "complaint_text",
+        "predicted_department",
+        "predicted_urgency",
+        "combined_confidence",
+        "impact_area",
+        "target_sla",
+        "priority_label",
+        "risk_score",
+        "frustration_score",
+        "escalation_risk",
+    ]
 
     return {
         "total_cases": int(len(enriched)),
@@ -192,24 +293,18 @@ def build_overview(frame: pd.DataFrame) -> dict[str, Any]:
         "urgent_rate": round((len(urgent_cases) / len(enriched)) * 100, 1),
         "average_risk_score": float(enriched["risk_score"].mean().round(2)),
         "average_confidence": average_confidence,
+        "average_frustration": average_frustration,
         "most_loaded_department": most_loaded_department,
         "department_distribution": by_department.to_dict(orient="records"),
         "urgency_distribution": urgency_distribution.to_dict(orient="records"),
+        "escalation_distribution": escalation_distribution,
         "action_board": action_board.to_dict(orient="records"),
         "keywords": keywords,
         "executive_summary": executive_summary,
+        "incident_clusters": clusters[:8],
+        "deduplication_metrics": dedup_metrics,
+        "geo_analytics": geo_analytics,
         "top_risks": enriched.sort_values("risk_score", ascending=False)
-        .head(6)[
-            [
-                "complaint_text",
-                "predicted_department",
-                "predicted_urgency",
-                "combined_confidence",
-                "impact_area",
-                "target_sla",
-                "priority_label",
-                "risk_score",
-            ]
-        ]
+        .head(6)[top_risks_columns]
         .to_dict(orient="records"),
     }

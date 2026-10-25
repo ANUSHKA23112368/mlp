@@ -1,51 +1,151 @@
-complaint_text,department,urgency
-"Street lights have been out near the school for five nights and children are walking home in the dark.",public_safety,high
-"Garbage collection has been skipped twice this week and stray dogs are tearing open trash bags.",sanitation,medium
-"The water pipeline in our apartment block has been leaking continuously and pressure is now very low.",water,high
-"My electricity bill shows a sudden extra charge and the support desk has not explained the increase.",utilities,medium
-"Potholes on the main market road caused two bike accidents this morning and traffic is blocked.",roads,high
-"The local clinic lost my mother's test report and delayed treatment for three days.",health,high
-"Our sewer line overflowed into the street and the smell is unbearable for nearby homes.",sanitation,high
-"The bus route that connects our area to the station was cancelled without notice again.",transport,medium
-"Noise from late-night construction has continued past midnight for the last week.",public_safety,medium
-"The hospital billing desk charged us twice and no one has processed the refund request.",health,medium
-"Street vendors are blocking the emergency exit near the metro stairway during rush hour.",public_safety,high
-"Water supply stops every afternoon and families cannot store enough for cooking and washing.",water,high
-"The online property tax portal crashes before payment confirmation and penalties are increasing.",digital_services,medium
-"My complaint about broken traffic signals has been open for twelve days with no action.",transport,high
-"The public toilet near the bus stand has not been cleaned for days and is unusable.",sanitation,medium
-"A transformer sparked loudly last night and power has been unstable since then.",utilities,high
-"The school scholarship office keeps rejecting forms without telling students what is missing.",education,medium
-"A tree branch fell across the road after the storm and no cleanup crew has arrived.",roads,medium
-"Patients waited six hours because the registration system at the hospital went offline.",health,high
-"Drinking water smells contaminated and several residents reported stomach issues.",water,critical
-"The city grievance website does not send complaint acknowledgements after submission.",digital_services,low
-"Street dogs have become aggressive near the park and elderly residents are afraid to walk there.",public_safety,high
-"The college hostel has repeated Wi-Fi outages during exams and students cannot access materials.",education,medium
-"Road repair work was started and abandoned, leaving deep trenches uncovered.",roads,high
-"Garbage bins near the market are overflowing every evening and attracting insects.",sanitation,medium
-"Our electricity meter reading was recorded incorrectly and the revised bill is still wrong.",utilities,medium
-"The emergency ward had no wheelchair available for an elderly patient after admission.",health,high
-"The bus stop shelter roof is broken and commuters are exposed to rain and falling debris.",transport,medium
-"Textbook distribution for the new term is delayed and many students have no materials.",education,medium
-"There is a major waterlogging problem at the junction after every small rainfall.",roads,medium
-"Two street lights on the narrow lane behind the clinic have not worked for ten days.",public_safety,medium
-"My pension verification request on the citizen portal has been pending for over a month.",digital_services,medium
-"Open manholes were left without warning signs near a busy residential crossing.",roads,critical
-"Frequent voltage drops are damaging appliances in our building and nobody is inspecting the line.",utilities,high
-"The health center appointment system booked the same slot for multiple patients.",health,medium
-"The sanitation team missed biomedical waste pickup from the clinic for two days.",sanitation,high
-"Water tankers promised during the outage never arrived in our neighborhood.",water,high
-"The after-school bus driver skipped our stop twice and students were stranded.",transport,high
-"The university exam helpline never answers and students are missing correction deadlines.",education,medium
-"Street harassment incidents near the underpass have increased and police patrols are absent.",public_safety,critical
-"The app for paying utility bills logs users out and loses transaction history.",digital_services,medium
-"The road divider near the hospital entrance is broken and vehicles are entering the wrong side.",roads,high
-"Water supply contains visible sediment and residents are buying bottled water daily.",water,critical
-"Several classrooms have broken fans and students cannot sit through afternoon lectures.",education,low
-"Power cuts have become frequent in the industrial block and small businesses are losing orders.",utilities,high
-"Garbage collection workers ignored our lane despite repeated complaints this month.",sanitation,medium
-"The ambulance access lane is blocked by illegal parking every evening.",public_safety,critical
-"The city bus tracking app shows wrong arrival times and people are missing connections.",transport,low
-"A patient referral letter was uploaded to the wrong record in the hospital system.",health,high
-"Rainwater has damaged the road surface outside the school and children keep slipping.",roads,medium
+complaint_text,department,urgency,ward,channel,timestamp,status
+Street lights have been out near the school for five nights and children are walking home in the dark.,public_safety,high,Ward 6 - University Quarter,Mobile App,2026-03-03 14:15,In Progress
+Garbage collection has been skipped twice this week and stray dogs are tearing open trash bags.,sanitation,medium,Ward 2 - Old Heritage,Web Portal,2026-03-08 08:37,Open
+The water pipeline in our apartment block has been leaking continuously and pressure is now very low.,water,high,Ward 3 - North Suburbs,Helpline 311,2026-03-03 08:13,Open
+My electricity bill shows a sudden extra charge and the support desk has not explained the increase.,utilities,medium,Ward 4 - East Industrial,Social Media (X),2026-04-09 06:35,Open
+Potholes on the main market road caused two bike accidents this morning and traffic is blocked.,roads,high,Ward 7 - West Market,Walk-in Desk,2026-04-05 19:14,Open
+The local clinic lost my mother's test report and delayed treatment for three days.,health,high,Ward 5 - South District,Mobile App,2026-03-02 11:44,In Progress
+Our sewer line overflowed into the street and the smell is unbearable for nearby homes.,sanitation,high,Ward 7 - West Market,Web Portal,2026-03-19 10:13,Open
+The bus route that connects our area to the station was cancelled without notice again.,transport,medium,Ward 8 - Riverside Greenbelt,Helpline 311,2026-03-23 09:05,Resolved
+Noise from late-night construction has continued past midnight for the last week.,public_safety,medium,Ward 1 - Downtown,Social Media (X),2026-03-24 17:38,Open
+The hospital billing desk charged us twice and no one has processed the refund request.,health,medium,Ward 5 - South District,Walk-in Desk,2026-03-31 09:59,In Progress
+Street vendors are blocking the emergency exit near the metro stairway during rush hour.,public_safety,high,Ward 3 - North Suburbs,Mobile App,2026-04-06 15:53,Open
+Water supply stops every afternoon and families cannot store enough for cooking and washing.,water,high,Ward 4 - East Industrial,Web Portal,2026-03-25 12:45,In Progress
+The online property tax portal crashes before payment confirmation and penalties are increasing.,digital_services,medium,Ward 5 - South District,Helpline 311,2026-03-16 15:05,Open
+My complaint about broken traffic signals has been open for twelve days with no action.,transport,high,Ward 6 - University Quarter,Social Media (X),2026-03-08 18:17,Resolved
+The public toilet near the bus stand has not been cleaned for days and is unusable.,sanitation,medium,Ward 7 - West Market,Walk-in Desk,2026-03-25 11:23,Open
+A transformer sparked loudly last night and power has been unstable since then.,utilities,high,Ward 8 - Riverside Greenbelt,Mobile App,2026-03-19 08:38,Open
+The school scholarship office keeps rejecting forms without telling students what is missing.,education,medium,Ward 6 - University Quarter,Web Portal,2026-04-05 13:10,In Progress
+A tree branch fell across the road after the storm and no cleanup crew has arrived.,roads,medium,Ward 2 - Old Heritage,Helpline 311,2026-03-19 13:43,Open
+Patients waited six hours because the registration system at the hospital went offline.,health,high,Ward 5 - South District,Social Media (X),2026-03-05 13:52,In Progress
+Drinking water smells contaminated and several residents reported stomach issues.,water,critical,Ward 4 - East Industrial,Helpline 311,2026-03-27 14:04,In Progress
+The city grievance website does not send complaint acknowledgements after submission.,digital_services,low,Ward 5 - South District,Mobile App,2026-04-07 16:13,Open
+Street dogs have become aggressive near the park and elderly residents are afraid to walk there.,public_safety,high,Ward 6 - University Quarter,Web Portal,2026-03-27 20:09,In Progress
+The college hostel has repeated Wi-Fi outages during exams and students cannot access materials.,education,medium,Ward 6 - University Quarter,Helpline 311,2026-03-17 14:47,Open
+"Road repair work was started and abandoned, leaving deep trenches uncovered.",roads,high,Ward 8 - Riverside Greenbelt,Social Media (X),2026-04-08 18:23,In Progress
+Garbage bins near the market are overflowing every evening and attracting insects.,sanitation,medium,Ward 7 - West Market,Walk-in Desk,2026-03-10 22:31,Open
+Our electricity meter reading was recorded incorrectly and the revised bill is still wrong.,utilities,medium,Ward 2 - Old Heritage,Mobile App,2026-03-05 09:09,Open
+The emergency ward had no wheelchair available for an elderly patient after admission.,health,high,Ward 3 - North Suburbs,Web Portal,2026-03-29 08:24,In Progress
+The bus stop shelter roof is broken and commuters are exposed to rain and falling debris.,transport,medium,Ward 4 - East Industrial,Helpline 311,2026-03-31 22:16,Open
+Textbook distribution for the new term is delayed and many students have no materials.,education,medium,Ward 5 - South District,Social Media (X),2026-03-02 09:43,Resolved
+There is a major waterlogging problem at the junction after every small rainfall.,roads,medium,Ward 6 - University Quarter,Walk-in Desk,2026-03-19 16:07,Resolved
+Two street lights on the narrow lane behind the clinic have not worked for ten days.,public_safety,medium,Ward 5 - South District,Mobile App,2026-03-31 06:46,Open
+My pension verification request on the citizen portal has been pending for over a month.,digital_services,medium,Ward 8 - Riverside Greenbelt,Web Portal,2026-03-18 22:48,Resolved
+Open manholes were left without warning signs near a busy residential crossing.,roads,critical,Ward 1 - Downtown,Helpline 311,2026-03-21 22:38,Open
+Frequent voltage drops are damaging appliances in our building and nobody is inspecting the line.,utilities,high,Ward 2 - Old Heritage,Social Media (X),2026-03-25 11:34,Open
+The health center appointment system booked the same slot for multiple patients.,health,medium,Ward 3 - North Suburbs,Walk-in Desk,2026-04-04 06:38,Resolved
+The sanitation team missed biomedical waste pickup from the clinic for two days.,sanitation,high,Ward 5 - South District,Mobile App,2026-03-09 17:56,Open
+Water tankers promised during the outage never arrived in our neighborhood.,water,high,Ward 5 - South District,Web Portal,2026-03-21 13:03,Resolved
+The after-school bus driver skipped our stop twice and students were stranded.,transport,high,Ward 6 - University Quarter,Helpline 311,2026-04-07 08:05,Open
+The university exam helpline never answers and students are missing correction deadlines.,education,medium,Ward 6 - University Quarter,Social Media (X),2026-03-06 10:08,In Progress
+Street harassment incidents near the underpass have increased and police patrols are absent.,public_safety,critical,Ward 8 - Riverside Greenbelt,Social Media (X),2026-04-06 11:16,In Progress
+The app for paying utility bills logs users out and loses transaction history.,digital_services,medium,Ward 1 - Downtown,Mobile App,2026-04-09 19:13,Open
+The road divider near the hospital entrance is broken and vehicles are entering the wrong side.,roads,high,Ward 1 - Downtown,Web Portal,2026-03-27 17:28,In Progress
+Water supply contains visible sediment and residents are buying bottled water daily.,water,critical,Ward 3 - North Suburbs,Social Media (X),2026-03-09 13:14,In Progress
+Several classrooms have broken fans and students cannot sit through afternoon lectures.,education,low,Ward 4 - East Industrial,Social Media (X),2026-03-03 13:37,Open
+Power cuts have become frequent in the industrial block and small businesses are losing orders.,utilities,high,Ward 4 - East Industrial,Walk-in Desk,2026-03-06 07:14,Open
+Garbage collection workers ignored our lane despite repeated complaints this month.,sanitation,medium,Ward 6 - University Quarter,Mobile App,2026-03-04 16:04,Open
+The ambulance access lane is blocked by illegal parking every evening.,public_safety,critical,Ward 7 - West Market,Social Media (X),2026-03-19 21:13,Open
+The city bus tracking app shows wrong arrival times and people are missing connections.,transport,low,Ward 8 - Riverside Greenbelt,Helpline 311,2026-04-07 21:15,Open
+A patient referral letter was uploaded to the wrong record in the hospital system.,health,high,Ward 5 - South District,Social Media (X),2026-03-14 09:06,In Progress
+Rainwater has damaged the road surface outside the school and children keep slipping.,roads,medium,Ward 6 - University Quarter,Walk-in Desk,2026-03-24 19:26,In Progress
+"Major main water pipeline burst on 5th Avenue near the central library, gushing thousands of gallons and flooding nearby shops.",water,critical,Ward 3 - North Suburbs,Mobile App,2026-03-08 07:25,Open
+Water pipe rupture on 5th Avenue has flooded the roadway and water pressure dropped completely across Sector 4.,water,critical,Ward 4 - East Industrial,Social Media (X),2026-03-08 13:12,In Progress
+"Huge water leak from underground main pipe at 5th Avenue corner, water entering basements and blocking pedestrian walk.",water,critical,Ward 5 - South District,Helpline 311,2026-03-10 19:11,In Progress
+"Electric transformer exploded with loud bang near West Industrial gate 3, thick smoke billowing and power cut.",utilities,critical,Ward 4 - East Industrial,Mobile App,2026-03-17 08:28,In Progress
+"Transformer caught fire on Industrial Road near gate 3, fire brigade alerted but power grid line is sparking.",utilities,critical,Ward 4 - East Industrial,Social Media (X),2026-03-05 06:05,Open
+"Complete power failure after transformer sparked and burned on West Industrial sector road, factories halted.",utilities,high,Ward 4 - East Industrial,Mobile App,2026-03-17 11:26,Resolved
+"Traffic signals at Central Crossway junction are dead, creating massive gridlock and near-head-on collisions.",transport,high,Ward 1 - Downtown,Web Portal,2026-03-15 18:57,Open
+Broken traffic lights at Central Crossway crossing causing heavy traffic jam and vehicles speeding dangerously.,transport,high,Ward 2 - Old Heritage,Helpline 311,2026-03-26 06:24,Open
+"Sewage water is mixing into residential drinking pipeline in Block C, tap water smells foul and looks brown.",water,critical,Ward 3 - North Suburbs,Mobile App,2026-03-20 19:44,In Progress
+"No municipal water supply in Green Meadows society for four consecutive days, borewell dried up.",water,high,Ward 4 - East Industrial,Walk-in Desk,2026-04-06 21:09,Resolved
+Underground valve leakage is causing low water pressure on the second and third floors of our residential block.,water,medium,Ward 5 - South District,Mobile App,2026-03-15 07:37,Open
+"Water metering bill jumped from 300 to 4500 without any change in consumption, inspection request pending.",water,low,Ward 6 - University Quarter,Web Portal,2026-03-05 16:03,In Progress
+Water tanker driver demanded illegal cash bribe over the official municipal rate before dispensing water.,water,high,Ward 7 - West Market,Helpline 311,2026-04-01 22:58,Open
+"Broken fire hydrant is spewing water on 8th Cross road, wasting clean water and creating slippery hazard.",water,medium,Ward 8 - Riverside Greenbelt,Social Media (X),2026-03-12 07:32,Resolved
+Fluoride test report requested for municipal borewell six weeks ago has not been published or shared.,water,low,Ward 1 - Downtown,Walk-in Desk,2026-03-13 08:38,Open
+"Water distribution valve broke down in Ward 7, entire colony has dry taps since morning.",water,high,Ward 2 - Old Heritage,Mobile App,2026-03-17 18:07,Open
+Dirty muddy water coming out of kitchen taps since the drainage digging started nearby.,water,high,Ward 3 - North Suburbs,Web Portal,2026-04-07 13:37,Resolved
+"Water pipeline repair trench was filled with mud instead of concrete, sinking when cars pass over.",water,medium,Ward 4 - East Industrial,Helpline 311,2026-04-10 08:26,In Progress
+Massive crater-sized pothole on Highway 9 bypass has punctured four car tires and caused vehicle damage.,roads,high,Ward 5 - South District,Social Media (X),2026-04-07 22:20,In Progress
+Pedestrian footbridge over the railway track has corroded rusted railings shaking dangerously in the wind.,roads,critical,Ward 6 - University Quarter,Mobile App,2026-03-22 13:16,Open
+Construction gravel and loose stones dumped on cycle track causing daily slips and minor accidents.,roads,medium,Ward 7 - West Market,Mobile App,2026-03-21 20:20,Open
+Road signage on outer ring road was knocked down during storm and drivers are missing the highway exit.,roads,low,Ward 8 - Riverside Greenbelt,Web Portal,2026-03-06 06:29,Resolved
+"Speed breaker near kindergarten school has no reflective paint or warning signs, vehicles fly over it violently.",roads,high,Ward 6 - University Quarter,Helpline 311,2026-04-07 09:04,In Progress
+Tar resurfacing carried out two weeks ago is already peeling off and exposing sharp aggregate stones.,roads,medium,Ward 2 - Old Heritage,Social Media (X),2026-04-03 14:08,Open
+Sinkhole forming on the shoulder of Riverside Expressway after heavy storm drain collapse.,roads,critical,Ward 3 - North Suburbs,Mobile App,2026-03-17 17:18,Open
+Illegal speed bump built by private contractor is scraping car underbodies and causing severe spine jerks.,roads,medium,Ward 4 - East Industrial,Mobile App,2026-04-05 15:39,Open
+Pedestrian zebra crossing stripes have completely faded outside primary health clinic.,roads,low,Ward 1 - Downtown,Web Portal,2026-04-06 15:59,In Progress
+"Median barrier broken into jagged concrete edges after truck collision, obstructing the fast lane.",roads,high,Ward 6 - University Quarter,Helpline 311,2026-03-10 14:07,In Progress
+Road widening excavation left exposed electrical cables right along the pedestrian sidewalk.,roads,critical,Ward 7 - West Market,Helpline 311,2026-03-19 15:38,Open
+Dead stray animal carcass lying decomposing on the road divider near Sector 9 market for over 48 hours.,sanitation,high,Ward 7 - West Market,Walk-in Desk,2026-03-23 12:43,Open
+Municipal waste segregation truck dumping collected dry and wet garbage together into the open landfill.,sanitation,medium,Ward 1 - Downtown,Mobile App,2026-03-18 22:31,In Progress
+"Public garbage compactor station emits putrid stench across the neighborhood, attracting rodents and flies.",sanitation,medium,Ward 2 - Old Heritage,Web Portal,2026-03-05 08:40,Open
+"Open drains along the fish market are blocked with plastic bags, causing sewage backflow into stalls.",sanitation,high,Ward 7 - West Market,Helpline 311,2026-03-19 07:00,Open
+Sanitation staff has stopped door-to-door waste collection in our alley since last Friday.,sanitation,medium,Ward 4 - East Industrial,Social Media (X),2026-03-10 14:10,Open
+Toxic chemical waste drums dumped illegally in vacant government plot behind residential society.,sanitation,critical,Ward 5 - South District,Social Media (X),2026-04-06 19:35,In Progress
+Public dustbins in central park broken and overflowing onto the jogging path.,sanitation,low,Ward 6 - University Quarter,Mobile App,2026-03-06 10:34,Open
+Septic tank overflow in community center toilet spilling untreated waste onto adjacent playground.,sanitation,critical,Ward 7 - West Market,Helpline 311,2026-04-08 10:27,In Progress
+"Street sweeping staff sweep dust directly into roadside stormwater drains, choking them completely.",sanitation,medium,Ward 8 - Riverside Greenbelt,Helpline 311,2026-03-21 17:57,Open
+Commercial restaurant dumping cooking grease and oil straight into the public street gutter.,sanitation,high,Ward 1 - Downtown,Social Media (X),2026-03-04 17:13,Resolved
+"Gang of youth speeding recklessly on modified motorbikes late night, shouting and intimidating pedestrians.",public_safety,high,Ward 2 - Old Heritage,Walk-in Desk,2026-03-08 17:49,In Progress
+Emergency SOS call box at the subway station has dead line and power indicator is dark.,public_safety,critical,Ward 3 - North Suburbs,Social Media (X),2026-04-10 10:59,In Progress
+Dark alley between shopping mall and bus stand has no functional security cameras or lighting.,public_safety,high,Ward 4 - East Industrial,Web Portal,2026-03-12 11:56,Resolved
+Liquor shop opened directly opposite residential school gate in violation of civic zoning rules.,public_safety,high,Ward 6 - University Quarter,Helpline 311,2026-03-13 16:50,Open
+Aggressive stray dog pack bit an 8-year-old child and a delivery rider in our apartment compound.,public_safety,critical,Ward 6 - University Quarter,Mobile App,2026-03-19 11:50,Open
+Fallen live electrical cable dangling at eye level from wooden pole outside grocery store.,public_safety,critical,Ward 7 - West Market,Social Media (X),2026-03-26 07:54,Open
+Illegal fireworks stall set up near petroleum gas depot with zero safety clearances.,public_safety,critical,Ward 8 - Riverside Greenbelt,Mobile App,2026-03-14 20:22,Open
+"Burglaries reported in three neighboring apartments in one week, request urgent police patrolling.",public_safety,high,Ward 1 - Downtown,Web Portal,2026-03-16 13:01,Open
+Construction crane swinging heavy steel beams directly over live traffic without safety netting.,public_safety,critical,Ward 2 - Old Heritage,Social Media (X),2026-03-27 16:17,Open
+Abandoned vehicle parked for six months with smashed windows and used for anti-social activities.,public_safety,medium,Ward 3 - North Suburbs,Social Media (X),2026-03-19 17:41,Resolved
+"Frequent power tripping every twenty minutes during peak summer afternoon, AC and refrigerators damaged.",utilities,high,Ward 4 - East Industrial,Walk-in Desk,2026-04-05 16:01,Open
+High voltage surge fried televisions and computers across ten houses in Lakeview colony.,utilities,high,Ward 5 - South District,Mobile App,2026-03-18 11:37,Open
+Electric power pole leaning at dangerous 45-degree angle over parked cars after heavy storm.,utilities,critical,Ward 6 - University Quarter,Mobile App,2026-03-08 19:22,Open
+"Underground gas pipeline smells of sulfur leak near building foundation, residents evacuated parking.",utilities,critical,Ward 7 - West Market,Social Media (X),2026-03-29 22:07,In Progress
+Electricity meter box open and exposed to rain without waterproof cover on public boundary wall.,utilities,high,Ward 8 - Riverside Greenbelt,Social Media (X),2026-04-07 12:16,Open
+Solar rooftop net metering credits not adjusted in the monthly electricity bill for three cycles.,utilities,low,Ward 1 - Downtown,Walk-in Desk,2026-03-29 06:33,Open
+"Streetlight timer misconfigured, lights remain on full bright at noon and shut off at dusk.",utilities,low,Ward 2 - Old Heritage,Mobile App,2026-04-05 12:23,Resolved
+Commercial power tariff applied mistakenly to residential agricultural pump house.,utilities,medium,Ward 3 - North Suburbs,Web Portal,2026-03-23 16:42,Open
+"Power outage in maternity clinic during delivery, backup diesel generator failed to start.",utilities,critical,Ward 1 - Downtown,Social Media (X),2026-04-03 15:42,In Progress
+Smart meter readings showing impossible 1200 units consumption in an empty locked apartment.,utilities,medium,Ward 5 - South District,Social Media (X),2026-03-27 15:35,Open
+Government hospital pharmacy has been out of essential insulin and asthma inhalers for three weeks.,health,high,Ward 1 - Downtown,Walk-in Desk,2026-03-26 11:39,Open
+"Primary health center doctor arrives two hours late daily, leaving sick mothers and infants waiting in heat.",health,medium,Ward 7 - West Market,Mobile App,2026-03-27 06:19,In Progress
+"Dengue outbreak in ward with six confirmed cases, vector control team has not carried out mosquito fogging.",health,critical,Ward 8 - Riverside Greenbelt,Mobile App,2026-03-29 16:29,Open
+"Blood bank emergency helpline disconnected, unable to procure rare O-negative unit for trauma surgery.",health,critical,Ward 1 - Downtown,Mobile App,2026-03-15 22:30,In Progress
+Hospital emergency triage nurse refused treatment to accident victim demanding prior police clearance.,health,critical,Ward 1 - Downtown,Social Media (X),2026-03-20 22:42,Open
+"Vaccination certificate generated with wrong birth date and name, passport clearance stalled.",health,medium,Ward 3 - North Suburbs,Walk-in Desk,2026-03-23 08:52,In Progress
+Hospital diagnostic lab results delayed past critical chemotherapy appointment window.,health,high,Ward 1 - Downtown,Mobile App,2026-03-16 12:09,In Progress
+"Ultrasound machine broken for two months at maternity ward, poor patients redirected to costly private labs.",health,high,Ward 5 - South District,Web Portal,2026-03-17 21:39,Open
+Unsanitary conditions in hospital post-operative ward with blood stains on bedsheets.,health,high,Ward 1 - Downtown,Helpline 311,2026-04-07 12:45,Open
+Clinic receptionist charging unauthorized documentation fee for issuing free government health cards.,health,medium,Ward 5 - South District,Social Media (X),2026-03-17 10:41,Open
+Electric bus fleet breakdown on line 42 has left commuters waiting over 90 minutes at metro interchange.,transport,high,Ward 8 - Riverside Greenbelt,Walk-in Desk,2026-03-08 19:14,In Progress
+City bus conductor refused to accept official student concession travel pass and forced passenger off bus.,transport,medium,Ward 1 - Downtown,Mobile App,2026-04-04 20:03,Open
+Overcrowded feeder mini-buses running with open doors and passengers hanging dangerously from steps.,transport,high,Ward 2 - Old Heritage,Web Portal,2026-03-09 20:08,In Progress
+Metro automated ticket vending machines reject 500-rupee currency notes and UPI QR scanner fails constantly.,transport,medium,Ward 3 - North Suburbs,Helpline 311,2026-04-04 16:48,In Progress
+Auto-rickshaw drivers at airport stand refuse meter fare and demand triple flat rate unlawfully.,transport,medium,Ward 4 - East Industrial,Social Media (X),2026-04-10 22:27,Resolved
+Cycle sharing docking station in university campus has all bikes damaged or locked with broken chains.,transport,low,Ward 6 - University Quarter,Walk-in Desk,2026-04-06 20:57,In Progress
+"Bus display board shows wrong terminal destination, leading passengers on wrong route.",transport,low,Ward 6 - University Quarter,Mobile App,2026-04-01 20:16,Open
+Reckless city transit bus driver broke red signal and scraped pedestrian barricade.,transport,high,Ward 7 - West Market,Web Portal,2026-03-19 22:31,In Progress
+Public charging station for electric two-wheelers has 3 of 4 charging guns broken.,transport,low,Ward 8 - Riverside Greenbelt,Helpline 311,2026-03-19 20:04,In Progress
+"Subway escalator has been out of service for three months, creating hazard for disabled commuters.",transport,medium,Ward 1 - Downtown,Social Media (X),2026-03-17 14:21,In Progress
+Citizen grievance portal gives 504 Gateway Timeout error whenever uploading PDF proof documents.,digital_services,medium,Ward 2 - Old Heritage,Walk-in Desk,2026-04-05 08:08,Open
+Birth certificate correction application stuck in 'processing' status for four months with zero updates.,digital_services,medium,Ward 3 - North Suburbs,Mobile App,2026-03-26 10:45,Open
+Online trade license renewal portal deducted fee twice from bank account but generated no receipt.,digital_services,medium,Ward 4 - East Industrial,Web Portal,2026-03-28 19:21,Open
+City mobile application crashes immediately upon launch on Android 14 devices.,digital_services,medium,Ward 5 - South District,Helpline 311,2026-03-28 07:13,Open
+Citizen portal password reset SMS OTP is never delivered to registered mobile numbers.,digital_services,high,Ward 6 - University Quarter,Social Media (X),2026-03-26 06:54,In Progress
+Property tax calculation portal shows phantom arrears from 2012 that were already paid and receipted.,digital_services,low,Ward 7 - West Market,Walk-in Desk,2026-04-07 18:30,Resolved
+Municipal employment portal application submit button is disabled on last day of job posting.,digital_services,high,Ward 8 - Riverside Greenbelt,Mobile App,2026-03-24 15:48,Open
+Smart city parking mobile app charged parking fee for 8 hours when vehicle left after 30 minutes.,digital_services,low,Ward 1 - Downtown,Web Portal,2026-03-28 13:31,Open
+Online death certificate download link returns corrupted 0-byte PDF file.,digital_services,medium,Ward 2 - Old Heritage,Helpline 311,2026-03-29 21:01,Open
+GIS ward map on city portal shows outdated boundaries causing incorrect jurisdiction assignments.,digital_services,low,Ward 3 - North Suburbs,Social Media (X),2026-03-27 11:53,Open
+Government school roof leaking directly over students' exam desks during monsoon rains.,education,high,Ward 6 - University Quarter,Walk-in Desk,2026-03-10 06:58,Open
+Midday meal delivered to primary school smelled sour and caused food poisoning symptoms in four pupils.,education,critical,Ward 6 - University Quarter,Mobile App,2026-03-07 19:08,Open
+No math or science teacher assigned to high school class 10 for the entire academic quarter.,education,high,Ward 6 - University Quarter,Web Portal,2026-03-13 07:16,Resolved
+"School toilet doors broken and no running water, forcing girl students to miss school.",education,high,Ward 6 - University Quarter,Helpline 311,2026-03-15 20:20,Open
+University degree certificate delivered with misspelled graduate name and wrong major subject.,education,low,Ward 6 - University Quarter,Social Media (X),2026-03-26 14:48,Open
+"School playground boundary wall collapsed, leaving open access to busy vehicular traffic.",education,critical,Ward 6 - University Quarter,Mobile App,2026-03-07 21:01,In Progress
+Special education needs classroom lacks Braille learning kits and hearing assistance devices.,education,medium,Ward 2 - Old Heritage,Mobile App,2026-03-05 17:14,In Progress
+Municipal preschool staff physically left toddler unattended outside gates after closing bell.,education,critical,Ward 6 - University Quarter,Social Media (X),2026-03-04 06:15,Open
+Library computers have malware and internet connection disconnected for non-payment of bills.,education,low,Ward 4 - East Industrial,Helpline 311,2026-03-03 10:15,Open
+School scholarship disbursements for underprivileged students delayed by six months.,education,medium,Ward 6 - University Quarter,Social Media (X),2026-03-09 12:29,Open
+College campus sports ground lights vandalized and electrical switches left exposed.,education,medium,Ward 6 - University Quarter,Walk-in Desk,2026-03-25 11:38,In Progress
