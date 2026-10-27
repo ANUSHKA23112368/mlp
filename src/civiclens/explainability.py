@@ -144,7 +144,7 @@ def _generate_highlighted_text(text: str, positive_features: list[dict[str, Any]
         token = item["token"]
         score = item["score"]
         opacity = min(0.85, max(0.2, score / max_score * 0.75 + 0.15))
-        style = f"background-color: rgba(15, 139, 141, {opacity:.2f}); padding: 2px 5px; border-radius: 4px; font-weight: 600; color: #042b2c;"
+        style = f"background-color: rgba(14, 165, 233, {opacity:.2f}); border: 1px solid rgba(56, 189, 248, 0.4); padding: 2px 6px; border-radius: 4px; font-weight: 600; color: #e0f2fe;"
         # Case-insensitive replacement
         pattern = re.compile(rf"\b({re.escape(token)})\b", re.IGNORECASE)
         escaped = pattern.sub(rf'<mark style="{style}">\1</mark>', escaped)

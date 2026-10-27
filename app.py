@@ -49,172 +49,193 @@ def inject_theme() -> None:
     st.markdown(
         """
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
 
         :root {
-            --ink: #112033;
-            --muted: #5c6c7f;
-            --panel: rgba(255, 255, 255, 0.88);
-            --panel-strong: rgba(255, 255, 255, 0.96);
-            --line: rgba(148, 163, 184, 0.28);
-            --accent: #0f8b8d;
-            --accent-soft: #dff5f2;
-            --amber: #f4a261;
-            --rose: #f28482;
-            --purple: #8338ec;
+            --ink: #f1f5f9;
+            --muted: #94a3b8;
+            --panel: rgba(15, 23, 42, 0.78);
+            --panel-strong: rgba(15, 23, 42, 0.92);
+            --line: rgba(56, 189, 248, 0.16);
+            --accent: #00f2fe;
+            --accent-soft: rgba(0, 242, 254, 0.12);
+            --amber: #fbbf24;
+            --rose: #f43f5e;
+            --purple: #a855f7;
         }
 
         html, body, [class*="css"] {
-            font-family: 'Manrope', sans-serif;
-            color: var(--ink);
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #f1f5f9;
         }
 
         .stApp {
-            background:
-                radial-gradient(circle at top left, #ddf2ef 0%, rgba(221, 242, 239, 0.55) 22%, transparent 48%),
-                radial-gradient(circle at top right, #fde7d1 0%, rgba(253, 231, 209, 0.55) 20%, transparent 42%),
-                linear-gradient(180deg, #f7fafc 0%, #eef4f9 100%);
+            background-color: #080d19;
+            background-image:
+                radial-gradient(circle at 10% 12%, rgba(0, 242, 254, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 88% 18%, rgba(168, 85, 247, 0.07) 0%, transparent 45%),
+                radial-gradient(circle at 50% 85%, rgba(14, 165, 233, 0.05) 0%, transparent 50%),
+                linear-gradient(180deg, #080d19 0%, #0c1222 100%);
+            color: #f1f5f9;
         }
 
         [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #102033 0%, #162845 100%);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            background: linear-gradient(180deg, #070c18 0%, #0a1120 100%) !important;
+            border-right: 1px solid rgba(56, 189, 248, 0.15) !important;
         }
 
         [data-testid="stSidebar"] * {
-            color: #edf5ff;
+            color: #e2e8f0;
         }
 
         [data-testid="stFileUploaderDropzone"] {
-            background: linear-gradient(180deg, rgba(61, 94, 140, 0.26) 0%, rgba(30, 47, 78, 0.48) 100%) !important;
-            border: 1px dashed rgba(255, 255, 255, 0.22) !important;
-            border-radius: 20px !important;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            background: rgba(15, 23, 42, 0.6) !important;
+            border: 1px dashed rgba(56, 189, 248, 0.3) !important;
+            border-radius: 18px !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
         }
 
         [data-testid="stFileUploaderDropzone"] * {
-            color: #f5fbff !important;
+            color: #e0f2fe !important;
         }
 
         [data-testid="stFileUploaderDropzone"] button {
-            background: rgba(10, 21, 38, 0.82) !important;
-            color: #ffffff !important;
-            border: 1px solid rgba(255, 255, 255, 0.24) !important;
-            border-radius: 14px !important;
+            background: rgba(0, 242, 254, 0.15) !important;
+            color: #00f2fe !important;
+            border: 1px solid rgba(0, 242, 254, 0.35) !important;
+            border-radius: 12px !important;
         }
 
         [data-testid="stSidebar"] .stDownloadButton button {
             width: 100%;
-            background: linear-gradient(135deg, #0f8b8d 0%, #2aa9a5 100%) !important;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%) !important;
             color: #ffffff !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border: 1px solid rgba(0, 242, 254, 0.25) !important;
             border-radius: 14px !important;
-            box-shadow: 0 10px 24px rgba(4, 12, 24, 0.22);
+            box-shadow: 0 8px 20px rgba(0, 180, 216, 0.25);
+            font-weight: 600;
         }
 
-        h1, h2, h3, h4 {
+        h1, h2, h3, h4, h5, h6 {
             font-family: 'Space Grotesk', sans-serif;
-            letter-spacing: -0.04em;
-            color: var(--ink);
+            letter-spacing: -0.03em;
+            color: #f1f5f9 !important;
         }
 
         .hero-card {
-            background: linear-gradient(135deg, rgba(17, 32, 51, 0.98) 0%, rgba(15, 139, 141, 0.9) 58%, rgba(244, 162, 97, 0.82) 100%);
+            background: linear-gradient(135deg, #091424 0%, #0d223f 50%, #091a30 100%);
+            border: 1px solid rgba(0, 242, 254, 0.28);
+            border-top: 2px solid #00f2fe;
             padding: 2.2rem;
-            border-radius: 28px;
+            border-radius: 24px;
             color: #ffffff;
-            box-shadow: 0 24px 50px rgba(17, 32, 51, 0.20);
-            margin-bottom: 1.2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 35px rgba(0, 242, 254, 0.1);
+            margin-bottom: 1.5rem;
+            position: relative;
         }
 
         .hero-card h1 {
-            color: #ffffff;
+            color: #ffffff !important;
             margin: 0.35rem 0 0.5rem 0;
             font-size: 3.2rem;
+            text-shadow: 0 0 30px rgba(0, 242, 254, 0.25);
         }
 
         .hero-kicker {
             text-transform: uppercase;
-            letter-spacing: 0.18em;
+            letter-spacing: 0.2em;
             font-size: 0.78rem;
-            opacity: 0.84;
+            color: #00f2fe;
+            font-weight: 700;
         }
 
         .hero-copy {
             max-width: 950px;
             font-size: 1.05rem;
             line-height: 1.65;
-            color: rgba(255, 255, 255, 0.92);
+            color: #cbd5e1;
         }
 
         .hero-meta {
             display: flex;
             flex-wrap: wrap;
             gap: 0.65rem;
-            margin-top: 1rem;
+            margin-top: 1.1rem;
         }
 
         .hero-pill {
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            background: rgba(255, 255, 255, 0.14);
-            color: #ffffff;
-            padding: 0.42rem 0.75rem;
+            border: 1px solid rgba(0, 242, 254, 0.28);
+            background: rgba(0, 242, 254, 0.08);
+            color: #e0f2fe;
+            padding: 0.42rem 0.85rem;
             border-radius: 999px;
-            font-size: 0.90rem;
+            font-size: 0.88rem;
             font-weight: 500;
+            backdrop-filter: blur(8px);
         }
 
         .metric-card {
-            background: var(--panel);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            border-radius: 22px;
-            padding: 1rem 1.1rem;
-            box-shadow: 0 14px 35px rgba(148, 163, 184, 0.15);
+            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 20px;
+            padding: 1.1rem 1.2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
             min-height: 132px;
+            backdrop-filter: blur(12px);
+            transition: all 0.25s ease;
+        }
+
+        .metric-card:hover {
+            border-color: rgba(0, 242, 254, 0.45);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 35px rgba(0, 242, 254, 0.12);
         }
 
         .metric-label {
-            font-size: 0.84rem;
+            font-size: 0.78rem;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--muted);
+            letter-spacing: 0.12em;
+            color: #94a3b8;
             margin-bottom: 0.45rem;
+            font-weight: 600;
         }
 
         .metric-value {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 2rem;
+            font-size: 2.1rem;
             line-height: 1.05;
-            color: var(--ink);
+            color: #38bdf8;
             margin-bottom: 0.30rem;
+            font-weight: 700;
         }
 
         .metric-detail {
-            color: var(--muted);
-            font-size: 0.90rem;
+            color: #64748b;
+            font-size: 0.88rem;
             line-height: 1.45;
         }
 
         .surface-card {
-            background: var(--panel-strong);
-            border: 1px solid var(--line);
-            border-radius: 22px;
-            padding: 1.2rem;
-            box-shadow: 0 14px 30px rgba(148, 163, 184, 0.12);
-            margin-bottom: 1rem;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 1.3rem;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.2rem;
+            backdrop-filter: blur(10px);
         }
 
         .panel-kicker {
-            color: var(--accent);
+            color: #00f2fe;
             text-transform: uppercase;
-            letter-spacing: 0.12em;
-            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+            font-size: 0.76rem;
             margin-bottom: 0.35rem;
             font-weight: 700;
         }
 
         .panel-copy {
-            color: var(--muted);
+            color: #cbd5e1;
             line-height: 1.65;
             font-size: 0.96rem;
         }
@@ -227,50 +248,119 @@ def inject_theme() -> None:
         }
 
         .signal-chip {
-            background: var(--accent-soft);
-            border: 1px solid rgba(15, 139, 141, 0.18);
-            color: var(--ink);
-            padding: 0.38rem 0.70rem;
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.28);
+            color: #7dd3fc;
+            padding: 0.38rem 0.75rem;
             border-radius: 999px;
             font-size: 0.88rem;
             font-weight: 500;
         }
 
         .cluster-box {
-            background: #ffffff;
-            border: 1px solid rgba(15, 139, 141, 0.25);
-            border-left: 6px solid #0f8b8d;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(56, 189, 248, 0.22);
+            border-left: 5px solid #00f2fe;
             border-radius: 14px;
-            padding: 1rem 1.2rem;
-            margin-bottom: 0.85rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 0.95rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
         }
 
         .sidebar-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 18px;
-            padding: 1rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(56, 189, 248, 0.18);
+            border-radius: 16px;
+            padding: 1.1rem;
             margin-bottom: 1rem;
         }
 
         .sidebar-title {
             font-family: 'Space Grotesk', sans-serif;
             color: #ffffff;
-            font-size: 1.05rem;
+            font-size: 1.08rem;
             font-weight: 700;
             margin-bottom: 0.4rem;
         }
 
         .highlight-container {
-            background: #ffffff;
-            border: 1px solid var(--line);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(56, 189, 248, 0.25);
             border-radius: 14px;
-            padding: 1.1rem;
-            line-height: 1.8;
-            font-size: 1.02rem;
+            padding: 1.2rem;
+            line-height: 1.85;
+            font-size: 1.05rem;
+            color: #f1f5f9;
             margin-top: 0.5rem;
             margin-bottom: 1rem;
+        }
+
+        /* Tabs styling */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 6px;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .stTabs [data-baseweb="tab"] {
+            color: #94a3b8 !important;
+            font-weight: 500;
+            border-radius: 10px;
+            padding: 8px 14px;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .stTabs [data-baseweb="tab"]:hover {
+            color: #f1f5f9 !important;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .stTabs [aria-selected="true"] {
+            background: rgba(0, 242, 254, 0.12) !important;
+            color: #00f2fe !important;
+            font-weight: 700;
+            border-bottom: 2px solid #00f2fe !important;
+        }
+
+        /* Form elements & inputs */
+        .stTextInput > div > div, .stTextArea > div > div, .stSelectbox > div > div {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            border-color: rgba(56, 189, 248, 0.25) !important;
+            color: #f1f5f9 !important;
+            border-radius: 12px !important;
+        }
+
+        .stButton > button {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(56, 189, 248, 0.3) !important;
+            border-radius: 12px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25) !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .stButton > button:hover {
+            border-color: #00f2fe !important;
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.35) !important;
+            transform: translateY(-1px);
+        }
+
+        /* Expander */
+        [data-testid="stExpander"] {
+            background: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 14px !important;
+        }
+
+        /* Dataframe border */
+        [data-testid="stDataFrame"] {
+            border: 1px solid rgba(56, 189, 248, 0.18) !important;
+            border-radius: 14px !important;
+            overflow: hidden;
         }
         </style>
         """,
@@ -717,15 +807,15 @@ with tab3:
                     f"""
                     <div class="cluster-box">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h4 style="margin: 0; color: #0f8b8d;">Cluster #{c['cluster_id']}: {c['incident_topic']}</h4>
-                            <span class="hero-pill" style="background: #0f8b8d; font-size: 0.8rem;">{c['total_reports']} Reports</span>
+                            <h4 style="margin: 0; color: #00f2fe;">Cluster #{c['cluster_id']}: {c['incident_topic']}</h4>
+                            <span class="hero-pill" style="background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.35); color: #e0f2fe; font-size: 0.8rem;">{c['total_reports']} Reports</span>
                         </div>
-                        <p style="margin: 0.4rem 0 0.2rem 0; font-size: 0.85rem; color: #5c6c7f;">
+                        <p style="margin: 0.4rem 0 0.2rem 0; font-size: 0.85rem; color: #94a3b8;">
                             <strong>Department:</strong> {format_department(c.get('department', 'General'))} &nbsp;|&nbsp;
                             <strong>Urgency:</strong> {str(c.get('urgency', 'medium')).title()} &nbsp;|&nbsp;
                             <strong>Ward:</strong> {c.get('ward', 'General')}
                         </p>
-                        <p style="margin: 0.3rem 0; font-size: 0.95rem; color: #112033;">
+                        <p style="margin: 0.3rem 0; font-size: 0.95rem; color: #f1f5f9;">
                             <strong>Primary Ticket:</strong> "{c['primary_complaint']}"
                         </p>
                     </div>
