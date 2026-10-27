@@ -35,7 +35,14 @@ from civiclens.modeling import (
 from civiclens.summarizer import summarize_text
 from civiclens.topics import discover_topics
 
-st.set_page_config(page_title="CivicLens AI", page_icon="🏛️", layout="wide")
+# ── CivicShield Extensions ────────────────────────────────────────
+from civicshield.security import (
+    generate_demo_events, RuleEngine, AnomalyDetector,
+    correlate_events, SecurityEvent,
+)
+from civicshield.ml import check_data_quality, hash_dataset
+
+st.set_page_config(page_title="CivicShield AI", page_icon="🏛️", layout="wide")
 
 
 def inject_theme() -> None:
@@ -382,9 +389,9 @@ with st.sidebar:
     st.markdown(
         """
         <div class="sidebar-card">
-            <div class="sidebar-title">🏛️ CivicLens AI v2.0</div>
+            <div class="sidebar-title">🛡️ CivicShield AI v3.0</div>
             <div class="panel-copy">
-                Enterprise ML & NLP suite for citizen ticket triage, incident clustering, XAI attribution, and operational intelligence.
+                Intelligent Civic Operations & Cybersecurity Platform — Complaint Triage, Security Monitoring, XAI, and Real-Time Analytics.
             </div>
         </div>
         """,
@@ -440,10 +447,10 @@ dedup_metrics = overview.get("deduplication_metrics", {})
 st.markdown(
     f"""
     <div class="hero-card">
-        <div class="hero-kicker">Operational ML & NLP Grievance Intelligence</div>
-        <h1>CivicLens AI</h1>
+        <div class="hero-kicker">Civic Intelligence & Security Operations</div>
+        <h1>CivicShield AI</h1>
         <div class="hero-copy">
-            Classify issue ownership and urgency, detect near-duplicate incident clusters, explain predictions with token attribution, and monitor citizen frustration flashpoints in real time.
+            Unified civic intelligence and cybersecurity platform — classify complaints, detect security threats, explain ML predictions, and monitor operations in real time.
         </div>
         <div class="hero-meta">
             <span class="hero-pill">Dataset: {dataset_name}</span>
@@ -965,3 +972,270 @@ with tab7:
     low_conf = prediction_frame.sort_values("combined_confidence").head(6)
     lc_cols = ["complaint_text", "predicted_department", "predicted_urgency", "combined_confidence", "impact_area"]
     st.dataframe(format_prediction_table(low_conf[lc_cols]), use_container_width=True, hide_index=True)
+
+
+# ---------------------------------------------------------
+# TAB 8: Security Operations Dashboard
+# ---------------------------------------------------------
+with tab8:
+    st.markdown("### \U0001f6e1 Security Operations Center")
+    st.caption("Real-time security event monitoring, threat detection, and incident correlation. All data labelled as **demo environment**.")
+
+    sec_col1, sec_col2 = st.columns([0.3, 0.7])
+    with sec_col1:
+        event_count = st.slider("Demo Events to Generate", 20, 200, 75, 5)
+        hours_back = st.slider("Time Window (hours)", 1, 72, 24)
+
+    demo_events = generate_demo_events(count=event_count, hours_back=hours_back, seed=42)
+
+    # Run rule engine on all events
+    rule_engine = RuleEngine()
+    all_alerts = []
+    for i, evt in enumerate(demo_events):
+        history = demo_events[max(0, i-50):i]
+        alerts = rule_engine.evaluate(evt, history)
+        all_alerts.extend(alerts)
+
+    # Run anomaly detector
+    detector = AnomalyDetector(contamination=0.08)
+    detector.fit(demo_events)
+    anomaly_alerts = []
+    for evt in demo_events:
+        ml_alert = detector.detect(evt)
+        if ml_alert:
+            anomaly_alerts.append(ml_alert)
+
+    all_alerts.extend(anomaly_alerts)
+
+    # Correlate events
+    threads = correlate_events(demo_events, time_window_minutes=15)
+
+    # KPI Cards
+    s_cols = st.columns(5)
+    with s_cols[0]:
+        render_metric_card("Total Events", str(len(demo_events)), f"Last {hours_back}h (demo)")
+    with s_cols[1]:
+        critical_count = sum(1 for e in demo_events if e.severity.value == "critical")
+        render_metric_card("Critical Events", str(critical_count), "Require immediate review")
+    with s_cols[2]:
+        render_metric_card("Rule Alerts", str(len(all_alerts) - len(anomaly_alerts)), "Deterministic detections")
+    with s_cols[3]:
+        render_metric_card("ML Anomalies", str(len(anomaly_alerts)), "Isolation Forest detections")
+    with s_cols[4]:
+        render_metric_card("Correlated Threads", str(len(threads)), "Related event groups")
+
+    st.markdown("---")
+
+    sec_left, sec_right = st.columns([1.1, 0.9])
+    with sec_left:
+        st.markdown("#### Recent Security Events")
+        event_records = []
+        for e in demo_events[:30]:
+            event_records.append({
+                "Event ID": e.event_id,
+                "Time": e.timestamp.strftime("%H:%M:%S"),
+                "Source IP": e.source_ip,
+                "Service": e.source_service,
+                "Category": e.category.value.replace("_", " ").title(),
+                "Severity": e.severity.value.upper(),
+                "Description": e.description[:80],
+            })
+        st.dataframe(pd.DataFrame(event_records), use_container_width=True, hide_index=True)
+
+    with sec_right:
+        st.markdown("#### Active Alerts")
+        if all_alerts:
+            for alert in all_alerts[:10]:
+                severity_colors = {"critical": "\U0001f534", "high": "\U0001f7e0", "medium": "\U0001f7e1", "low": "\U0001f7e2"}
+                icon = severity_colors.get(alert.severity.value, "\u26aa")
+                st.markdown(f"{icon} **{alert.title}** ({alert.severity.value.upper()})")
+                st.caption(f"{alert.description[:120]}")
+                st.markdown("---")
+        else:
+            st.success("No active alerts detected.")
+
+        st.markdown("#### Correlated Threat Threads")
+        if threads:
+            for t in threads[:5]:
+                st.markdown(
+                    f"**Thread #{t['thread_id']}** — IP: `{t['source_ip']}` | "
+                    f"{t['event_count']} events | Max Severity: {t['max_severity'].upper()} | "
+                    f"Span: {t['time_span_minutes']}min"
+                )
+                with st.expander(f"Details for Thread #{t['thread_id']}"):
+                    for desc in t['descriptions'][:3]:
+                        st.write(f"- {desc}")
+        else:
+            st.info("No correlated threat threads detected.")
+
+    # Category distribution chart
+    st.markdown("#### Event Category Distribution")
+    cat_counts = pd.Series([e.category.value for e in demo_events]).value_counts()
+    cat_df = pd.DataFrame({"Category": cat_counts.index.str.replace("_", " ").str.title(), "Count": cat_counts.values})
+    st.bar_chart(cat_df.set_index("Category"), use_container_width=True)
+
+    st.info("\u2139\ufe0f All security events shown above are **synthetic demo data** generated for demonstration purposes.")
+
+
+# ---------------------------------------------------------
+# TAB 9: ML Lab — Enhanced Model Training
+# ---------------------------------------------------------
+with tab9:
+    st.markdown("### \U0001f9ea ML Lab — Enhanced Training Pipeline")
+    st.caption("Train models with character n-gram features, compare word-only vs combined features, and track model versions.")
+
+    lab_col1, lab_col2 = st.columns(2)
+    with lab_col1:
+        use_char = st.checkbox("Enable Character N-gram Features", value=True)
+        st.caption("Adds character-level TF-IDF (3-5 grams) alongside word features for better handling of typos and morphological patterns.")
+    with lab_col2:
+        st.markdown("**Feature Combination Strategy**")
+        if use_char:
+            st.success("\u2705 Word (1,2)-grams + Char (3,5)-grams via FeatureUnion")
+        else:
+            st.info("Word (1,2)-grams only (baseline)")
+
+    if st.button("\U0001f680 Train Enhanced Model", use_container_width=True):
+        with st.spinner("Training enhanced pipeline..."):
+            from civicshield.ml import train_enhanced_model, compute_enhanced_metrics
+            from sklearn.model_selection import train_test_split
+
+            texts = dataset["complaint_text"].tolist()
+            dept_labels = dataset["department"].tolist()
+            urg_labels = dataset["urgency"].tolist()
+
+            # Split
+            from civiclens.modeling import safe_train_test_split
+            train_df, test_df = safe_train_test_split(dataset, test_size=0.25, random_state=42)
+
+            # Train department model
+            dept_model = train_enhanced_model(
+                train_df["complaint_text"].tolist(),
+                train_df["department"].tolist(),
+                use_char_features=use_char,
+            )
+            dept_pred = dept_model.predict(test_df["complaint_text"].tolist())
+            dept_metrics = compute_enhanced_metrics(
+                test_df["department"].tolist(), dept_pred.tolist(), label="department"
+            )
+
+            # Train urgency model
+            urg_model = train_enhanced_model(
+                train_df["complaint_text"].tolist(),
+                train_df["urgency"].tolist(),
+                use_char_features=use_char,
+            )
+            urg_pred = urg_model.predict(test_df["complaint_text"].tolist())
+            urg_metrics = compute_enhanced_metrics(
+                test_df["urgency"].tolist(), urg_pred.tolist(), label="urgency"
+            )
+
+        st.markdown("#### Enhanced Model Results")
+        r_cols = st.columns(4)
+        with r_cols[0]:
+            render_metric_card("Dept Accuracy", f"{dept_metrics['department_accuracy']*100:.1f}%", "Enhanced pipeline")
+        with r_cols[1]:
+            render_metric_card("Dept Macro F1", f"{dept_metrics['department_macro_f1']*100:.1f}%", "Across all classes")
+        with r_cols[2]:
+            render_metric_card("Urg Accuracy", f"{urg_metrics['urgency_accuracy']*100:.1f}%", "Enhanced pipeline")
+        with r_cols[3]:
+            render_metric_card("Urg Macro F1", f"{urg_metrics['urgency_macro_f1']*100:.1f}%", "Across all classes")
+
+        # Comparison with baseline
+        st.markdown("#### Baseline vs Enhanced Comparison")
+        baseline_metrics = artifacts.metrics
+        comparison = pd.DataFrame({
+            "Metric": ["Department Accuracy", "Urgency Accuracy"],
+            "Baseline (word only)": [
+                f"{baseline_metrics['department_accuracy']*100:.1f}%",
+                f"{baseline_metrics['urgency_accuracy']*100:.1f}%",
+            ],
+            "Enhanced": [
+                f"{dept_metrics['department_accuracy']*100:.1f}%",
+                f"{urg_metrics['urgency_accuracy']*100:.1f}%",
+            ],
+            "Features": [
+                "Word+Char" if use_char else "Word only",
+                "Word+Char" if use_char else "Word only",
+            ],
+        })
+        st.dataframe(comparison, use_container_width=True, hide_index=True)
+
+        # Model version
+        from civicshield.ml import generate_model_version, hash_dataset
+        ds_hash = hash_dataset(dataset)
+        version = generate_model_version("enhanced_lr", ds_hash)
+        st.info(f"\U0001f4e6 Model Version: `{version}` | Dataset Hash: `{ds_hash[:16]}...`")
+
+
+# ---------------------------------------------------------
+# TAB 10: Data Quality Dashboard
+# ---------------------------------------------------------
+with tab10:
+    st.markdown("### \U0001f4cb Data Quality Dashboard")
+    st.caption("Automated data quality checks, class balance analysis, and dataset health monitoring.")
+
+    quality_report = check_data_quality(dataset)
+
+    # Health banner
+    if quality_report.is_healthy:
+        st.success("\u2705 Dataset is healthy — no critical quality issues detected.")
+    else:
+        st.warning(f"\u26a0\ufe0f {len(quality_report.warnings)} quality warning(s) detected.")
+
+    # KPI cards
+    dq_cols = st.columns(5)
+    with dq_cols[0]:
+        render_metric_card("Total Rows", str(quality_report.total_rows), "Records in dataset")
+    with dq_cols[1]:
+        render_metric_card("Missing Text", str(quality_report.missing_text), "Empty complaint fields")
+    with dq_cols[2]:
+        render_metric_card("Duplicates", str(quality_report.duplicate_texts), "Exact text duplicates")
+    with dq_cols[3]:
+        render_metric_card("Short Texts", str(quality_report.very_short_texts), "< 10 characters")
+    with dq_cols[4]:
+        render_metric_card("Imbalance Ratio", f"{quality_report.imbalance_ratio:.1f}x", "Max/min class ratio")
+
+    st.markdown("---")
+
+    dq_left, dq_right = st.columns(2)
+    with dq_left:
+        st.markdown("#### Class Distribution")
+        if quality_report.class_distribution:
+            class_df = pd.DataFrame(
+                list(quality_report.class_distribution.items()),
+                columns=["Department", "Count"]
+            )
+            class_df["Department"] = class_df["Department"].apply(
+                lambda d: d.replace("_", " ").title()
+            )
+            st.bar_chart(class_df.set_index("Department"), use_container_width=True)
+            st.dataframe(class_df, use_container_width=True, hide_index=True)
+
+    with dq_right:
+        st.markdown("#### Quality Warnings")
+        if quality_report.warnings:
+            for warning in quality_report.warnings:
+                st.warning(f"\u26a0\ufe0f {warning}")
+        else:
+            st.success("No warnings — dataset passes all quality checks.")
+
+        st.markdown("#### Text Length Distribution")
+        if "complaint_text" in dataset.columns:
+            lengths = dataset["complaint_text"].str.len()
+            length_stats = pd.DataFrame({
+                "Statistic": ["Mean", "Median", "Min", "Max", "Std Dev"],
+                "Characters": [
+                    f"{lengths.mean():.0f}",
+                    f"{lengths.median():.0f}",
+                    f"{lengths.min():.0f}",
+                    f"{lengths.max():.0f}",
+                    f"{lengths.std():.0f}",
+                ],
+            })
+            st.dataframe(length_stats, use_container_width=True, hide_index=True)
+
+    # Dataset hash for versioning
+    from civicshield.ml import hash_dataset
+    ds_hash = hash_dataset(dataset)
+    st.info(f"\U0001f4be Dataset Hash: `{ds_hash[:32]}...` — use this to track which dataset version trained which model.")

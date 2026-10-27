@@ -7,6 +7,13 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
+# ── CivicShield extensions ─────────────────────────────────────────────────
+from civicshield.shared.logging import configure_logging
+from civicshield.shared.middleware import register_middleware
+from civicshield.auth.router import router as auth_router
+
+configure_logging()
+
 ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
@@ -27,12 +34,16 @@ from civiclens.summarizer import summarize_text
 from civiclens.topics import discover_topics
 
 app = FastAPI(
-    title="CivicLens AI API",
-    version="2.0.0",
-    description="Enterprise NLP & Machine Learning Platform for Citizen Grievance Triage, Incident Clustering, XAI Explainability, and Operational Risk Intelligence.",
+    title="CivicShield AI API",
+    version="3.0.0",
+    description="Intelligent Civic Operations and Cybersecurity Platform.",
 )
 
-# Global dataset & trained model artifacts
+# Middleware and routers
+register_middleware(app)
+app.include_router(auth_router)
+
+# Global dataset and trained model artifacts
 demo_data = load_demo_data()
 artifacts = train_models(demo_data)
 
