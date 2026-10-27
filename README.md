@@ -24,6 +24,12 @@
 
 ---
 
+## Latest Updates
+
+- **v3.0 Dark Theme Overhaul** *(Oct 2026)*: Complete dark theme redesign for Command Center and all dashboard tabs with improved contrast, modern glassmorphism styling, and enhanced readability.
+
+---
+
 ## Architecture & Project Structure
 
 ```text
