@@ -19,7 +19,7 @@
 - **JWT Authentication & RBAC**: Secure API access with role-based access control (admin, analyst, viewer) and structured JSON logging.
 - **10-Tab Interactive Dashboard**: Streamlit dashboard with Command Center, Security Ops, ML Lab, Data Quality, and more.
 - **Enterprise FastAPI Service**: Production REST API with auth, batch processing, explainability endpoints, middleware, and OpenAPI documentation.
-- **54 Automated Tests**: Comprehensive test suite covering pipelines, API, auth, security module, ML enhancements, explainability, and deduplication.
+- **56 Automated Tests**: Comprehensive test suite covering pipelines, API, auth, security module, ML enhancements, explainability, and deduplication.
 - **CI/CD with GitHub Actions**: Automated testing on push, security scanning with Bandit, and secret detection with Gitleaks.
 
 ---
@@ -150,7 +150,7 @@ The API supports JWT-based authentication with three roles:
 # Install dependencies
 pip install -r requirements.txt
 
-# Run tests (54 tests)
+# Run tests (56 tests)
 python -m pytest
 
 # Start FastAPI server
@@ -169,7 +169,7 @@ open http://localhost:8000/docs
 
 GitHub Actions workflows run automatically on push and PR to `main`:
 
-- **test.yml**: Runs all 54 pytest tests
+- **test.yml**: Runs all 56 pytest tests
 - **security.yml**: Bandit SAST scan + Gitleaks secret detection
 
 ---
@@ -192,7 +192,7 @@ GitHub Actions workflows run automatically on push and PR to `main`:
 ## Test Coverage
 
 ```
-54 tests across 9 test files:
+56 tests across 10 test files:
   test_api.py              —  9 tests (FastAPI endpoints)
   test_auth.py             — 12 tests (JWT, login, RBAC, middleware)
   test_security.py         — 11 tests (rules, anomaly, generator, correlator)
