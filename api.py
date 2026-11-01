@@ -96,7 +96,7 @@ class SimilarQueryRequest(BaseModel):
 def health() -> dict[str, Any]:
     return {
         "status": "ok",
-        "version": "2.0.0",
+        "version": "3.0.0",
         "active_algorithm": artifacts.algorithm,
         "sample_count": len(demo_data),
         "department_accuracy": artifacts.metrics.get("department_accuracy"),
@@ -245,3 +245,81 @@ def overview() -> dict[str, Any]:
 def brief() -> dict[str, str]:
     predictions = artifacts.predict(demo_data["complaint_text"].tolist())
     return {"report": build_executive_report(predictions)}
+
+
+# ---------------------------------------------------------
+# Security Operations Endpoints
+# ---------------------------------------------------------
+from civicshield.security import (
+    generate_demo_events,
+    RuleEngine,
+    AnomalyDetector,
+    correlate_events,
+)
+
+
+class SecurityScanRequest(BaseModel):
+    event_count: int = Field(50, ge=10, le=500, description="Number of demo security events to generate")
+    hours_back: int = Field(24, ge=1, le=168, description="Time window in hours")
+    anomaly_contamination: float = Field(0.08, ge=0.01, le=0.3, description="Isolation Forest contamination factor")
+
+
+@app.post("/security/scan", tags=["Security Operations"])
+def security_scan(request: SecurityScanRequest) -> dict:
+    """Generate demo security events and run rule engine + anomaly detection."""
+    events = generate_demo_events(count=request.event_count, hours_back=request.hours_back, seed=42)
+
+    # Rule engine
+    rule_engine = RuleEngine()
+    rule_alerts = []
+    for i, evt in enumerate(events):
+        history = events[max(0, i - 50):i]
+        rule_alerts.extend(rule_engine.evaluate(evt, history))
+
+    # Anomaly detection
+    detector = AnomalyDetector(contamination=request.anomaly_contamination)
+    detector.fit(events)
+    anomaly_alerts = [a for evt in events if (a := detector.detect(evt)) is not None]
+
+    # Correlation
+    threads = correlate_events(events, time_window_minutes=15)
+
+    severity_counts = {}
+    for e in events:
+        sev = e.severity.value
+        severity_counts[sev] = severity_counts.get(sev, 0) + 1
+
+    return {
+        "total_events": len(events),
+        "severity_distribution": severity_counts,
+        "rule_alerts": len(rule_alerts),
+        "anomaly_alerts": len(anomaly_alerts),
+        "correlated_threads": len(threads),
+        "threads_summary": [
+            {
+                "thread_id": t["thread_id"],
+                "source_ip": t["source_ip"],
+                "event_count": t["event_count"],
+                "max_severity": t["max_severity"],
+            }
+            for t in threads[:10]
+        ],
+        "environment": "demo",
+    }
+
+
+@app.get("/security/summary", tags=["Security Operations"])
+def security_summary() -> dict:
+    """Quick security posture summary with default parameters."""
+    events = generate_demo_events(count=50, hours_back=24, seed=42)
+    category_counts = {}
+    for e in events:
+        cat = e.category.value
+        category_counts[cat] = category_counts.get(cat, 0) + 1
+
+    return {
+        "total_events": len(events),
+        "categories": category_counts,
+        "top_category": max(category_counts, key=category_counts.get) if category_counts else None,
+        "environment": "demo",
+    }

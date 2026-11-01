@@ -116,3 +116,27 @@ def test_api_geo_analytics():
     data = geo.json()
     assert "ward_distribution" in data
     assert "channel_distribution" in data
+
+
+
+def test_api_security_scan():
+    res = client.post(
+        "/security/scan",
+        json={"event_count": 20, "hours_back": 12},
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total_events"] == 20
+    assert "severity_distribution" in data
+    assert "rule_alerts" in data
+    assert "anomaly_alerts" in data
+    assert data["environment"] == "demo"
+
+
+def test_api_security_summary():
+    res = client.get("/security/summary")
+    assert res.status_code == 200
+    data = res.json()
+    assert "total_events" in data
+    assert "categories" in data
+    assert data["environment"] == "demo"

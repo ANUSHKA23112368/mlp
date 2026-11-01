@@ -12,7 +12,7 @@ DATA_DIR = PROJECT_ROOT / "data"
 
 # ── Application identity ────────────────────────────────────────────────────────
 APP_NAME: str = os.getenv("CIVICSHIELD_APP_NAME", "CivicShield AI")
-APP_VERSION: str = "0.1.0"
+APP_VERSION: str = "3.0.0"
 ENVIRONMENT: str = os.getenv("CIVICSHIELD_ENV", "development")   # development | production | demo
 DEBUG: bool = os.getenv("CIVICSHIELD_DEBUG", "true").lower() == "true"
 

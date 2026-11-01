@@ -557,7 +557,7 @@ st.markdown(
 # ---------------------------------------------------------
 # Main Tabs Navigation
 # ---------------------------------------------------------
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs(
     [
         "Command Center",
         "Case Studio & Explainability",
@@ -566,6 +566,9 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
         "Data Explorer",
         "Ops Console",
         "Model Quality & Benchmark",
+        "Security Operations",
+        "ML Lab",
+        "Data Quality",
     ]
 )
 
