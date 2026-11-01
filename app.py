@@ -349,6 +349,46 @@ def inject_theme() -> None:
             transform: translateY(-1px);
         }
 
+        /* Glassmorphism Cards & Modern Accents */
+        .metric-card {
+            border: 1px solid rgba(56, 189, 248, 0.22) !important;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
+            backdrop-filter: blur(16px) saturate(180%) !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .metric-card:hover {
+            border-color: #00f2fe !important;
+            transform: translateY(-3px) scale(1.01) !important;
+            box-shadow: 0 15px 35px -5px rgba(0, 242, 254, 0.25) !important;
+        }
+
+        /* Pulse glow for hero badge */
+        .hero-pill {
+            animation: pulse-border 3s infinite ease-in-out;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(0, 242, 254, 0.3); box-shadow: 0 0 5px rgba(0, 242, 254, 0.1); }
+            50% { border-color: rgba(0, 242, 254, 0.8); box-shadow: 0 0 14px rgba(0, 242, 254, 0.35); }
+        }
+
+        /* Scrollbar beautification */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.25);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f2fe;
+        }
+
         /* Expander */
         [data-testid="stExpander"] {
             background: rgba(15, 23, 42, 0.6) !important;
