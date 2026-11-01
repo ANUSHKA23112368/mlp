@@ -13,8 +13,8 @@ from civiclens.analytics import format_department
 
 
 def test_format_department_standard_keys():
-    assert format_department("water") == "Water & Sewage" or "Water" in format_department("water")
-    assert format_department("electricity") == "Power & Electricity" or "Power" in format_department("electricity")
+    assert "Water" in format_department("water")
+    assert "Electricity" in format_department("electricity")
 
 
 def test_format_department_unknown_key():
