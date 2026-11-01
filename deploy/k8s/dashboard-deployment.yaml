@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: civicshield-dashboard
+  labels:
+    app.kubernetes.io/name: civicshield-dashboard
+    app.kubernetes.io/part-of: civicshield
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: civicshield-dashboard
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: civicshield-dashboard
+    spec:
+      containers:
+        - name: dashboard
+          image: civicshield/dashboard:v3.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8501
+              name: streamlit
+          livenessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1.5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: civicshield-dashboard-service
+  labels:
+    app.kubernetes.io/name: civicshield-dashboard
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8501
+      targetPort: 8501
+      name: streamlit
+  selector:
+    app.kubernetes.io/name: civicshield-dashboard
