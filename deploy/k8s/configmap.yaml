@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: civicshield-config
+  labels:
+    app.kubernetes.io/name: civicshield-config
+data:
+  CIVICSHIELD_ENV: "production"
+  CIVICSHIELD_DEBUG: "false"
+  CIVICSHIELD_RATE_LIMIT: "120/minute"
+  CIVICSHIELD_RATE_LIMIT_PREDICT: "60/minute"
+  CIVICSHIELD_TOKEN_EXPIRE_MINUTES: "120"
+  CIVICSHIELD_ML_ALGORITHM: "logistic_regression"
+  CIVICSHIELD_SEC_RETENTION_DAYS: "90"
